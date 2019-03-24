@@ -3,9 +3,7 @@
 #include "constants.h"
 #include "food.h"
 
-static const qreal FOOD_RADIUS = 3.0;
-
-Food::Food(qreal x, qreal y)
+Food::Food(const int&foodSize,qreal x, qreal y):FOOD_SIZE(foodSize)
 {
     setPos(x, y);
     setData(GD_Type, GO_Food);
@@ -13,8 +11,8 @@ Food::Food(qreal x, qreal y)
 
 QRectF Food::boundingRect() const
 {
-    return QRectF(-TILE_SIZE,    -TILE_SIZE,
-                   TILE_SIZE * 2, TILE_SIZE * 2 );
+    return QRectF(-FOOD_SIZE,    -FOOD_SIZE,
+                   FOOD_SIZE * 2, FOOD_SIZE * 2 );
 }
 
 void Food::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -30,6 +28,6 @@ void Food::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 QPainterPath Food::shape() const
 {
     QPainterPath p;
-    p.addEllipse(QPointF(TILE_SIZE / 2, TILE_SIZE / 2), FOOD_RADIUS, FOOD_RADIUS);
+    p.addEllipse(QPointF(FOOD_SIZE / 2 + 1, FOOD_SIZE / 2 + 1), FOOD_SIZE/2, FOOD_SIZE/2);
     return p;
 }

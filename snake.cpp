@@ -4,15 +4,15 @@
 #include "gamecontroller.h"
 #include "snake.h"
 
-static const qreal SNAKE_SIZE = TILE_SIZE;
-
-Snake::Snake(GameController &controller) :
+Snake::Snake(const int&snakeSpeed,const int&snakeSize,QColor snakeColor,GameController &controller) :
     head(0, 0),
-    growing(7),
-    speed(5),
+    growing(1),
+    speed(snakeSpeed),
     moveDirection(NoMove),
-    controller(controller)
+    controller(controller),
+    SNAKE_SIZE(snakeSize)
 {
+    SNAKE_COLOR = snakeColor;
 }
 
 QRectF Snake::boundingRect() const
@@ -58,7 +58,7 @@ QPainterPath Snake::shape() const
 void Snake::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->save();
-    painter->fillPath(shape(), Qt::yellow);
+    painter->fillPath(shape(), SNAKE_COLOR);
     painter->restore();
 }
 
@@ -79,15 +79,17 @@ Snake::Direction Snake::currentDirection()
 {
 	return moveDirection;
 }
-
+//в заданому проміжку часу обновлюємо стан змії,тобто рухаємось
 void Snake::advance(int step)
 {
     if (!step) {
         return;
     }
+    //чим більше значення швидкості ,тим повільнішою буде змійка,бо обновлення буде відбуватись повільно
     if (tickCounter++ % speed != 0) {
         return;
     }
+    //на початку гри
     if (moveDirection == NoMove) {
         return;
     }

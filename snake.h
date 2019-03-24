@@ -3,10 +3,11 @@
 
 #include <QGraphicsItem>
 #include <QRectF>
-
+#include "settings.h"
+#include <QColor>
 class GameController;
 
-class Snake : public QGraphicsItem
+class Snake :public QObject, public QGraphicsItem
 {
 public:
     enum Direction {
@@ -17,7 +18,15 @@ public:
         MoveDown
     };
 
-    Snake(GameController & controller);
+    Snake(const int&snakeSpeed,const int&snakeSize ,QColor snakeColor,GameController & controller);
+    /* Данные методы виртуальные, поэтому их необходимо реализовать
+        * в случае наследования от QGraphicsItem
+        * */
+
+
+    /* возвращаем координаты расположения точки
+         * по ним будет определяться нажатие точки
+         * */
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -39,11 +48,14 @@ private:
 
     QPointF        head;
     int            growing;
-    int            speed;
+    const int      speed;
     QList<QPointF> tail;
     int            tickCounter;
     Direction      moveDirection;
     GameController &controller;
+
+    const int SNAKE_SIZE;
+    QColor SNAKE_COLOR;
 };
 
 #endif // SNAKE_H

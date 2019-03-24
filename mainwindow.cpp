@@ -10,24 +10,12 @@
 #include "mainwindow.h"
 #include <QIcon>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      scene(new QGraphicsScene(this)),
-      view(new QGraphicsView(scene, this)),
-      game(new GameController(*scene, this))
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
-    setCentralWidget(view);
-//    resize(600, 600);
-    setFixedSize(600, 600);
-    setWindowIcon(QIcon(":/images/snake_ico"));
+    CreateButtons();
+    setFixedSize(500, 500);
 
-	createActions();
-	createMenus();
-
-    initScene();
-    initSceneBackground();
-
-    QTimer::singleShot(0, this, SLOT(adjustViewSize()));
+    settingsData = SettingsData(5,5,Qt::yellow,Qt::gray);
 }
 
 MainWindow::~MainWindow()
@@ -35,90 +23,52 @@ MainWindow::~MainWindow()
     
 }
 
-void MainWindow::adjustViewSize()
+void MainWindow::NewGame()
 {
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatioByExpanding);
+    wnd = new GameWindow(settingsData);
+    wnd->show();
 }
 
-void MainWindow::createActions()
+void MainWindow::OpenSettings()
 {
-	newGameAction = new QAction(tr("&New Game"), this);
-	newGameAction->setShortcuts(QKeySequence::New);
-	newGameAction->setStatusTip(tr("Start a new game"));
-	connect(newGameAction, &QAction::triggered, this, &MainWindow::newGame);
-
-	exitAction = new QAction(tr("&Exit"), this);
-	exitAction->setShortcut(tr("Ctrl+Q"));
-	exitAction->setStatusTip(tr("Exit the game"));
-	connect(exitAction, &QAction::triggered, this, &MainWindow::close);
-
-	pauseAction = new QAction(tr("&Pause"), this);
-	pauseAction->setStatusTip(tr("Pause..."));
-	connect(pauseAction, &QAction::triggered, game, &GameController::pause);
-
-	resumeAction = new QAction(tr("&Resume"), this);
-	resumeAction->setStatusTip(tr("Resume..."));
-	connect(resumeAction, &QAction::triggered, game, &GameController::resume);
-
-	gameHelpAction = new QAction(tr("Game &Help"), this);
-	gameHelpAction->setShortcut(tr("Ctrl+H"));
-	gameHelpAction->setStatusTip(tr("Help on this game"));
-	connect(gameHelpAction, &QAction::triggered, this, &MainWindow::gameHelp);
-
-	aboutAction = new QAction(tr("&About"), this);
-	aboutAction->setStatusTip(tr("Show the application's about box"));
-	connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
-
-	aboutQtAction = new QAction(tr("About &Qt"), this);
-	aboutQtAction->setStatusTip(tr("Show the Qt library's About box"));
-	connect(aboutQtAction, &QAction::triggered, qApp, QApplication::aboutQt);
+    settingsWindow = new Settings;
+    connect(settingsWindow,&Settings::sendSettings,this,&MainWindow::SaveSettings);
+    settingsWindow->show();
 }
 
-void MainWindow::createMenus()
+void MainWindow::ShowLeaderBoard()
 {
-	QMenu *options = menuBar()->addMenu(tr("&Options"));
-	options->addAction(newGameAction);
-	options->addSeparator();
-	options->addAction(pauseAction);
-	options->addAction(resumeAction);
-	options->addSeparator();
-	options->addAction(exitAction);
 
-	QMenu *help = menuBar()->addMenu(tr("&Help"));
-	help->addAction(gameHelpAction);
-	help->addAction(aboutAction);
-	help->addAction(aboutQtAction);
 }
 
-void MainWindow::initScene()
+void MainWindow::CreateButtons()
 {
-    scene->setSceneRect(-100, -100, 200, 200);
+    newGame = new QPushButton("New Game",this);
+    connect(newGame, &QPushButton::clicked, this, &MainWindow::NewGame);
+
+    leaderboard = new QPushButton("Leaderboard",this);
+    connect(leaderboard, &QPushButton::clicked, this, &MainWindow::ShowLeaderBoard);
+
+    settings = new QPushButton("Settings",this);
+    connect(settings, &QPushButton::clicked, this, &MainWindow::OpenSettings);
+
+    quit = new QPushButton("Quit",this);
+    connect(quit, &QPushButton::clicked, this, &QApplication::quit);
+
+    this->layout = new QVBoxLayout; // or QVBoxLayout if you prefer
+    this->layout->addWidget(newGame);
+    this->layout->addWidget(leaderboard);
+    this->layout->addWidget(settings);
+    this->layout->addWidget(quit);
+
+    // set central widget of the main window
+    QWidget *central_widget = new QWidget;
+    central_widget->setLayout(this->layout);
+    this->setCentralWidget(central_widget);
 }
 
-void MainWindow::initSceneBackground()
+void MainWindow::SaveSettings(SettingsData settings)
 {
-    QPixmap bg(TILE_SIZE, TILE_SIZE);
-    QPainter p(&bg);
-    p.setBrush(QBrush(Qt::gray));
-    p.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
-
-    view->setBackgroundBrush(QBrush(bg));
+    settingsData = settings;
 }
 
-void MainWindow::newGame()
-{
-	QTimer::singleShot(0, game, SLOT(gameOver()));
-}
-
-void MainWindow::about()
-{
-	QMessageBox::about(this, tr("About this Game"), tr("<h2>Snake Game</h2>"
-		"<p>Copyright &copy; XXX."
-		"<p>This game is a small Qt application. It is based on the demo in the GitHub written by Devbean."));
-}
-
-void MainWindow::gameHelp()
-{
-	QMessageBox::about(this, tr("Game Help"), tr("Using direction keys to control the snake to eat the food"
-		"<p>Space - pause & resume"));
-}

@@ -4,21 +4,23 @@
 #include <QMessageBox>
 
 #include "gamecontroller.h"
-#include "food.h"
-#include "snake.h"
 
-GameController::GameController(QGraphicsScene &scene, QObject *parent) :
+GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
     QObject(parent),
     scene(scene),
-    snake(new Snake(*this)),
+    snake(new Snake(settings.snakeSpeed,settings.fieldSize,settings.snakeColor,*this)),
     isPause(false)
 {
-    timer.start( 1000/33 );
 
-	Food *a1 = new Food(0, -50);        
+    timer.start( 1000/33 );
+    set = settings;
+
+    Food *a1 = new Food(settings.fieldSize,0, -60);
     scene.addItem(a1);
 
     scene.addItem(snake);
+    //An event filter is an object that
+    //receives all events that are sent to this object.
     scene.installEventFilter(this);
 
     resume();
@@ -79,12 +81,13 @@ void GameController::addNewFood()
         y *= 10;
 	} while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));
 
-	Food *food = new Food(x, y);
+    Food *food = new Food(set.fieldSize,x, y);
     scene.addItem(food);
 }
 
 void GameController::gameOver()
 {
+    //Этот слот продвигает сцену на один шаг вызывая QGraphicsItem::advance() для всех элементов на сцене.
     disconnect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
     if (QMessageBox::Yes == QMessageBox::information(NULL,
                             tr("Game Over"), tr("Again?"),
@@ -93,11 +96,11 @@ void GameController::gameOver()
         connect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
         scene.clear();
 
-        snake = new Snake(*this);
+        snake = new Snake(set.snakeSpeed,set.fieldSize,set.snakeColor,*this);
         scene.addItem(snake);
         addNewFood();
     } else {
-        exit(0);
+        emit closeWnd();
     }
 }
 
@@ -114,9 +117,11 @@ void GameController::resume()
             &scene, SLOT(advance()));
     isPause = false;
 }
+//обробник подій,який буде реагувати на натискання наших клавіш
 
 bool GameController::eventFilter(QObject *object, QEvent *event)
 {
+    //якщо була натиснута клавіша,то перевіряємо яка
     if (event->type() == QEvent::KeyPress) {
         handleKeyPressed((QKeyEvent *)event);
         return true;

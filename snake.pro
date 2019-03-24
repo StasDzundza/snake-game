@@ -17,16 +17,24 @@ SOURCES += main.cpp\
     food.cpp \
     gamecontroller.cpp \
     snake.cpp \
-    wall.cpp
+    wall.cpp \
+    gamewindow.cpp \
+    settings.cpp
 
 HEADERS  += mainwindow.h \
     food.h \
     gamecontroller.h \
     constants.h \
     snake.h \
-    wall.h
+    wall.h \
+    gamewindow.h \
+    settings.h
 
 RESOURCES += \
     res.qrc
 
 RC_FILE += myapp.rc
+
+FORMS += \
+    mainwindow.ui \
+    settings.ui
