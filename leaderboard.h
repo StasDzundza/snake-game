@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include "gamecontroller.h"
-
+#include <QString>
 struct LeaderboardData;
 namespace Ui {
 class Leaderboard;

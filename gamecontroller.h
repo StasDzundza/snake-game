@@ -16,9 +16,9 @@ struct LeaderboardData
     {
         this->name = name;this->time = time;this->difficult = difficult;this->fieldSize = fieldSize;this->snakeLength = snakeLength;
     }
-    QString name;
+    QString name = "";
     QString time = "null";
-    QString difficult;
+    QString difficult = "";
     int fieldSize;
     int snakeLength;
 };

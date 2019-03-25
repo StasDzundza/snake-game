@@ -5,6 +5,9 @@
 #include <QInputDialog>
 #include "gamecontroller.h"
 #include <fstream>
+#include <QFile>
+#include <QTextStream>
+
 
 GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
     QObject(parent),
@@ -141,15 +144,24 @@ void GameController::AddResultToLeaderboard()
     }
     else
     {
-       LeaderboardData data;
-       data.name = str;
-       data.time = "Null";
-       data.difficult = set.difficult;
-       data.snakeLength = snake->GetLength();
+       LeaderboardData *data = new LeaderboardData;
+       data->name = str;
+       data->time = "Null";
+       data->difficult = set.difficult;
+       data->snakeLength = snake->GetLength();
+       data->fieldSize = set.fieldSize;
 
-       std::ofstream fout;
-       fout.open("leaderboard.bin",std::ios_base::out|std::ios_base::app|std::ios_base::binary);
-       fout.write((char*)&data,sizeof(LeaderboardData));
-       fout.close();
+       QFile fileOut("leaderboard.txt"); // Связываем объект с файлом fileout.txt
+       if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
+       {
+           QTextStream writeStream(&fileOut); // Создаем объект класса QTextStream
+           writeStream << data->name + "\n";
+           writeStream << data->time + "\n";
+           writeStream << data->difficult + "\n";
+           writeStream << QString::number(data->snakeLength) + "\n";
+           writeStream << QString::number(data->fieldSize) + "\n";
+           fileOut.close();
+       }
+
     }
 }
