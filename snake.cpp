@@ -77,7 +77,12 @@ void Snake::setMoveDirection(Direction direction)
 
 Snake::Direction Snake::currentDirection()
 {
-	return moveDirection;
+    return moveDirection;
+}
+
+int Snake::GetLength()
+{
+    return tail.size();
 }
 //в заданому проміжку часу обновлюємо стан змії,тобто рухаємось
 void Snake::advance(int step)

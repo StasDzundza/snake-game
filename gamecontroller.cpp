@@ -2,8 +2,9 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QMessageBox>
-
+#include <QInputDialog>
 #include "gamecontroller.h"
+#include <fstream>
 
 GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
     QObject(parent),
@@ -89,6 +90,7 @@ void GameController::gameOver()
 {
     //Этот слот продвигает сцену на один шаг вызывая QGraphicsItem::advance() для всех элементов на сцене.
     disconnect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
+    AddResultToLeaderboard();
     if (QMessageBox::Yes == QMessageBox::information(NULL,
                             tr("Game Over"), tr("Again?"),
                             QMessageBox::Yes | QMessageBox::No,
@@ -127,5 +129,27 @@ bool GameController::eventFilter(QObject *object, QEvent *event)
         return true;
     } else {
         return QObject::eventFilter(object, event);
+    }
+}
+
+void GameController::AddResultToLeaderboard()
+{
+    bool bOk;
+    QString str = QInputDialog::getText( nullptr, "Input", "Name:", QLineEdit::Normal, "Stas",  &bOk );
+    if (!bOk) {
+        // Была нажата кнопка Cancel
+    }
+    else
+    {
+       LeaderboardData data;
+       data.name = str;
+       data.time = "Null";
+       data.difficult = set.difficult;
+       data.snakeLength = snake->GetLength();
+
+       std::ofstream fout;
+       fout.open("leaderboard.bin",std::ios_base::out|std::ios_base::app|std::ios_base::binary);
+       fout.write((char*)&data,sizeof(LeaderboardData));
+       fout.close();
     }
 }

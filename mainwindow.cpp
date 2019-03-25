@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     CreateButtons();
     setFixedSize(500, 500);
 
-    settingsData = SettingsData(5,5,Qt::yellow,Qt::gray);
+    settingsData = SettingsData(5,5,Qt::yellow,Qt::gray,"Medium");
 }
 
 MainWindow::~MainWindow()
@@ -38,7 +38,8 @@ void MainWindow::OpenSettings()
 
 void MainWindow::ShowLeaderBoard()
 {
-
+    leaderboardWindow = new Leaderboard;
+    leaderboardWindow->show();
 }
 
 void MainWindow::CreateButtons()

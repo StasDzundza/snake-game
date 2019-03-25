@@ -31,35 +31,45 @@ Settings::~Settings()
     delete ui;
 }
 
+QString Settings::Difficult()
+{
+    return difficult;
+}
+
 
 void Settings::on_SaveButton_clicked()
 {
     if(ui->rbEasy->isChecked())
     {
-        SettingsData data(6,7,snakeColor,fieldColor);
-        emit sendSettings(data);
+        settings = SettingsData(6,7,snakeColor,fieldColor,"Easy");
+        difficult = "Easy";
+        emit sendSettings(settings);
     }
     else if(ui->rbMedium->isChecked())
     {
-        SettingsData data(5,6,snakeColor,fieldColor);
-        emit sendSettings(data);
+        settings = SettingsData(4,6,snakeColor,fieldColor,"Medium");
+        difficult = "Medium";
+        emit sendSettings(settings);
     }
     else if(ui->rbHard->isChecked())
     {
-        SettingsData data(2,4,snakeColor,fieldColor);
-        emit sendSettings(data);
+        settings = SettingsData(2,4,snakeColor,fieldColor,"Hard");
+        difficult = "Hard";
+        emit sendSettings(settings);
     }
     else if(ui->rbExtreme->isChecked())
     {
-        SettingsData data(1,4,snakeColor,fieldColor);
-        emit sendSettings(data);
+        settings = SettingsData(1,4,snakeColor,fieldColor,"Extreme");
+        difficult = "Extreme";
+        emit sendSettings(settings);
     }
     else if(ui->rbCustom->isChecked())
     {
         int speed = abs(ui->snakeSpeed->value() - 10) + 1;
         int size = abs(ui->fieldSize->value()-10) + 1 ;
-        SettingsData data(speed,size,snakeColor,fieldColor);
-        emit sendSettings(data);
+        settings = SettingsData(speed,size,snakeColor,fieldColor,"Custom");
+        difficult = "Custom";
+        emit sendSettings(settings);
     }
     close();
 }

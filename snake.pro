@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     snake.cpp \
     wall.cpp \
     gamewindow.cpp \
-    settings.cpp
+    settings.cpp \
+    leaderboard.cpp
 
 HEADERS  += mainwindow.h \
     food.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindow.h \
     snake.h \
     wall.h \
     gamewindow.h \
-    settings.h
+    settings.h \
+    leaderboard.h
 
 RESOURCES += \
     res.qrc
@@ -37,4 +39,5 @@ RC_FILE += myapp.rc
 
 FORMS += \
     mainwindow.ui \
-    settings.ui
+    settings.ui \
+    leaderboard.ui

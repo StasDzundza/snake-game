@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "gamewindow.h"
+#include "leaderboard.h"
 #include <QPushButton>
 #include <QLayout>
 
@@ -35,6 +36,8 @@ private:
 
     Settings*settingsWindow;
     SettingsData settingsData;
+    Leaderboard*leaderboardWindow;
+
     void NewGame();
     void CreateButtons();
     void OpenSettings();

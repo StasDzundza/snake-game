@@ -10,17 +10,19 @@ class Settings;
 struct SettingsData
 {
     SettingsData(){}
-    SettingsData(int snakeSpeed,int fieldSize,QColor snakeColor,QColor fieldColor)
+    SettingsData(int snakeSpeed,int fieldSize,QColor snakeColor,QColor fieldColor,QString difficult)
     {
         this->snakeSpeed = snakeSpeed;
         this->fieldSize = fieldSize;
         this->snakeColor = snakeColor;
         this->fieldColor = fieldColor;
+        this->difficult = difficult;
     }
     int snakeSpeed;
     int fieldSize;
     QColor snakeColor;
     QColor fieldColor;
+    QString difficult;
 };
 
 class Settings : public QDialog
@@ -30,7 +32,7 @@ class Settings : public QDialog
 public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings();
-
+    QString Difficult();
 private slots:
 
 
@@ -57,7 +59,8 @@ private:
     Ui::Settings *ui;
     QColor snakeColor = Qt::yellow;
     QColor fieldColor = Qt::gray;
-
+    SettingsData settings;
+    QString difficult;
 };
 
 #endif // SETTINGS_H

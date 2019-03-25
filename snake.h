@@ -35,6 +35,7 @@ public:
     void setMoveDirection(Direction direction);
 	Direction currentDirection();
 
+    int GetLength();
 protected:
     void advance(int step);
 

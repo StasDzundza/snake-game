@@ -12,14 +12,14 @@
 struct LeaderboardData
 {
     LeaderboardData(){}
-    LeaderboardData(QString name, QString time ,QString difficult, QString fieldSize,int snakeLength)
+    LeaderboardData(QString name, QString time ,QString difficult, int fieldSize,int snakeLength)
     {
         this->name = name;this->time = time;this->difficult = difficult;this->fieldSize = fieldSize;this->snakeLength = snakeLength;
     }
     QString name;
     QString time = "null";
     QString difficult;
-    QString fieldSize;
+    int fieldSize;
     int snakeLength;
 };
 
