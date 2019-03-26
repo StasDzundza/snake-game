@@ -8,6 +8,7 @@
 #include "settings.h"
 #include "food.h"
 #include "snake.h"
+#include <QTimer>
 
 struct LeaderboardData
 {
@@ -40,6 +41,11 @@ public slots:
     void resume();
     void gameOver();
 
+private slots:
+
+
+
+
 protected:
      bool eventFilter(QObject *object, QEvent *event);
 
@@ -47,6 +53,7 @@ private:
     void handleKeyPressed(QKeyEvent *event);
     void addNewFood();
     void AddResultToLeaderboard();
+    void SetDefaultSpeed(int speed);
 
     QTimer timer;
     QGraphicsScene &scene;
@@ -55,6 +62,11 @@ private:
     bool isPause;
 
     SettingsData set;
+
+    const int FoodTypeInterval = 4;
+    int current_step = 1;
+
+    QTimer timerForFoodEffect;
 };
 
 #endif // GAMECONTROLLER_H

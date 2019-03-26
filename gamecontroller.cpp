@@ -7,6 +7,7 @@
 #include <fstream>
 #include <QFile>
 #include <QTextStream>
+#include <QSignalMapper>
 
 
 GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
@@ -15,7 +16,6 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
     snake(new Snake(settings.snakeSpeed,settings.fieldSize,settings.snakeColor,*this)),
     isPause(false)
 {
-
     timer.start( 1000/33 );
     set = settings;
 
@@ -35,7 +35,21 @@ GameController::~GameController()
 }
 
 void GameController::snakeAteFood(Food *food)
-{
+{ 
+    if(food->getFoodType() == FoodType::MakeFaster)
+    {
+        int snakeSpeed = snake->GetSpeed();
+        snake->SetSpeed(1);
+        connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });
+        timerForFoodEffect.start(8000);
+    }
+    else if(food->getFoodType() == FoodType::MakeLower)
+    {
+        int snakeSpeed = snake->GetSpeed();
+        snake->SetSpeed(snakeSpeed*2);
+        connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });
+        timerForFoodEffect.start(8000);
+    }
     scene.removeItem(food);
 
     addNewFood();
@@ -85,7 +99,25 @@ void GameController::addNewFood()
         y *= 10;
 	} while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));
 
-    Food *food = new Food(set.fieldSize,x, y);
+    Food *food;
+
+    if(current_step%FoodTypeInterval == 0)
+    {
+        int type = qrand()%2 + 1;
+        if(type == 1)
+        {
+            food = new Food(set.fieldSize,x, y,FoodType::MakeFaster,Qt::green);
+        }
+        else
+        {
+            food = new Food(set.fieldSize,x, y,FoodType::MakeLower,Qt::black);
+        }
+    }
+    else
+    {
+        food = new Food(set.fieldSize,x, y,FoodType::Simple,Qt::red);
+    }
+    current_step++;
     scene.addItem(food);
 }
 
@@ -107,6 +139,12 @@ void GameController::gameOver()
     } else {
         emit closeWnd();
     }
+}
+
+void GameController::SetDefaultSpeed(int speed)
+{
+    snake->SetSpeed(speed);
+    timerForFoodEffect.stop();
 }
 
 void GameController::pause()

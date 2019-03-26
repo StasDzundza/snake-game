@@ -7,12 +7,12 @@
 Snake::Snake(const int&snakeSpeed,const int&snakeSize,QColor snakeColor,GameController &controller) :
     head(0, 0),
     growing(1),
-    speed(snakeSpeed),
     moveDirection(NoMove),
     controller(controller),
     SNAKE_SIZE(snakeSize)
 {
     SNAKE_COLOR = snakeColor;
+    speed = snakeSpeed;
 }
 
 QRectF Snake::boundingRect() const
@@ -83,6 +83,16 @@ Snake::Direction Snake::currentDirection()
 int Snake::GetLength()
 {
     return tail.size();
+}
+
+int Snake::GetSpeed()
+{
+    return speed;
+}
+
+void Snake::SetSpeed(int speed)
+{
+    this->speed = speed;
 }
 //в заданому проміжку часу обновлюємо стан змії,тобто рухаємось
 void Snake::advance(int step)

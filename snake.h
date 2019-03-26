@@ -36,6 +36,9 @@ public:
 	Direction currentDirection();
 
     int GetLength();
+
+    int GetSpeed();
+    void SetSpeed(int speed);
 protected:
     void advance(int step);
 
@@ -49,7 +52,7 @@ private:
 
     QPointF        head;
     int            growing;
-    const int      speed;
+    int            speed;
     QList<QPointF> tail;
     int            tickCounter;
     Direction      moveDirection;
