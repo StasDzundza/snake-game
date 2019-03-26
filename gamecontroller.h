@@ -61,7 +61,8 @@ private:
 
     SettingsData set;
 
-    const int FoodTypeInterval = 8;
+    const int FoodForSpeedInterval = 8;
+    const int FoodForPointsInterval = 13;
     int current_step = 1;
 
     QTimer timerForFoodEffect;
@@ -69,7 +70,10 @@ private:
     stopwatch *stopWatch;
     QTimer timePassed;
     QTimer timerForStopwatch;
-    int record = 0;
+
+    int pointsForSimpleFood = 0;
+    const int pointsForMoreScoreFood = 20;
+    int score = 0;
 };
 
 #endif // GAMECONTROLLER_H

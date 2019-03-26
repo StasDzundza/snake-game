@@ -3,7 +3,9 @@
 #include "fstream"
 #include <QDebug>
 #include <QFile>
+
 using std::string;
+
 Leaderboard::Leaderboard(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Leaderboard)
@@ -31,10 +33,7 @@ void Leaderboard::ShowLeaderboard()
                ui->leaderboard->append("Difficult : " + file.readLine() + "\n");
                ui->leaderboard->append("Score : " + file.readLine() + "\n");
                ui->leaderboard->append("Field size : " + file.readLine() + "\n");
-
                ui->leaderboard->append("---------------------------------------------");
-
-
            }
        }
        file.close();

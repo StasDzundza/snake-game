@@ -23,6 +23,12 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
     timer.start( 1000/33 );
     set = settings;
 
+    if(set.difficult == "Easy"){pointsForSimpleFood = 1;}
+    else if(set.difficult == "Medium"){pointsForSimpleFood = 1;}
+    else if(set.difficult == "Hard"){pointsForSimpleFood = 2;}
+    else if(set.difficult == "Extreme"){pointsForSimpleFood = 3;}
+    else {pointsForSimpleFood = 1;}
+
     addNewFood();
 
     scene.addItem(snake);
@@ -57,6 +63,14 @@ void GameController::snakeAteFood(Food *food)
         snake->SetSpeed(snakeSpeed*2);
         connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });
         timerForFoodEffect.start(8000);
+    }
+    if(food->getFoodType() == FoodType::Simple || food->getFoodType() == FoodType::MakeLower || food->getFoodType() == FoodType::MakeFaster)
+    {
+        score+=pointsForSimpleFood;
+    }
+    else
+    {
+        score+=pointsForMoreScoreFood;
     }
     scene.removeItem(food);
 
@@ -118,7 +132,7 @@ void GameController::addNewFood()
 
     Food *food;
 
-    if(current_step%FoodTypeInterval == 0)
+    if(current_step%FoodForSpeedInterval == 0)
     {
         int type = qrand()%2 + 1;
         if(type == 1)
@@ -144,6 +158,17 @@ void GameController::addNewFood()
             }
         }
     }
+    else if(current_step%FoodForPointsInterval == 0)
+    {
+        if(set.fieldColor == Qt::white)
+        {
+            food = new Food(set.fieldSize,x, y,FoodType::MorePointsToScore,Qt::darkBlue);
+        }
+        else
+        {
+            food = new Food(set.fieldSize,x, y,FoodType::MorePointsToScore,Qt::white);
+        }
+    }
     else
     {
         if(set.fieldColor == Qt::red)
@@ -164,9 +189,14 @@ void GameController::gameOver()
     //Этот слот продвигает сцену на один шаг вызывая QGraphicsItem::advance() для всех элементов на сцене.
     timerForStopwatch.stop();
     stopWatch->Stop();
+
     disconnect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
+
     AddResultToLeaderboard();
+
+    score = 0;
     stopWatch->Reset();
+
     if (QMessageBox::Yes == QMessageBox::information(NULL,
                             tr("Game Over"), tr("Again?"),
                             QMessageBox::Yes | QMessageBox::No,
@@ -192,7 +222,7 @@ void GameController::SetDefaultSpeed(int speed)
 
 void GameController::SendStopwatchData()
 {
-    emit sendStatusBarData(stopWatch->GetTime());
+    emit sendStatusBarData(stopWatch->GetTime() +  "    Score = " + QString::number(score));
 }
 
 void GameController::pause()
@@ -244,7 +274,7 @@ void GameController::AddResultToLeaderboard()
        data->name = str;
        data->time = stopWatch->GetTime();
        data->difficult = set.difficult;
-       data->score = snake->GetLength();
+       data->score = score;
        data->fieldSize = set.fieldSize;
 
        QFile fileOut("leaderboard.txt"); // Связываем объект с файлом fileout.txt

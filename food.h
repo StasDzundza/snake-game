@@ -8,7 +8,8 @@ enum FoodType
 {
     Simple,
     MakeFaster,
-    MakeLower
+    MakeLower,
+    MorePointsToScore
 };
 
 class Food : public QGraphicsItem
