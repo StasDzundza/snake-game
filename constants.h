@@ -1,8 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-const int TILE_SIZE = 5;
-
 enum GameObjectsData {
     GD_Type
 };

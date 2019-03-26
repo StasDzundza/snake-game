@@ -8,7 +8,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QSignalMapper>
-
+#include <QTime>
 
 GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
     QObject(parent),
@@ -16,11 +16,14 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
     snake(new Snake(settings.snakeSpeed,settings.fieldSize,settings.snakeColor,*this)),
     isPause(false)
 {
+    //seed for random
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
+
     timer.start( 1000/33 );
     set = settings;
 
-    Food *a1 = new Food(settings.fieldSize,0, -60);
-    scene.addItem(a1);
+    addNewFood();
 
     scene.addItem(snake);
     //An event filter is an object that
@@ -39,7 +42,8 @@ void GameController::snakeAteFood(Food *food)
     if(food->getFoodType() == FoodType::MakeFaster)
     {
         int snakeSpeed = snake->GetSpeed();
-        snake->SetSpeed(1);
+        if(snakeSpeed/2 == 0){ snake->SetSpeed(snakeSpeed/2 + 1);}
+        else{snake->SetSpeed(snakeSpeed/2);}
         connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });
         timerForFoodEffect.start(8000);
     }
@@ -106,16 +110,37 @@ void GameController::addNewFood()
         int type = qrand()%2 + 1;
         if(type == 1)
         {
-            food = new Food(set.fieldSize,x, y,FoodType::MakeFaster,Qt::green);
+            if(set.fieldColor == Qt::green)
+            {
+                food = new Food(set.fieldSize,x, y,FoodType::MakeFaster,Qt::cyan);
+            }
+            else
+            {
+                food = new Food(set.fieldSize,x, y,FoodType::MakeFaster,Qt::green);
+            }
         }
         else
         {
-            food = new Food(set.fieldSize,x, y,FoodType::MakeLower,Qt::black);
+            if(set.fieldColor == Qt::black)
+            {
+                food = new Food(set.fieldSize,x, y,FoodType::MakeLower,Qt::darkGray);
+            }
+            else
+            {
+                food = new Food(set.fieldSize,x, y,FoodType::MakeLower,Qt::black);
+            }
         }
     }
     else
     {
-        food = new Food(set.fieldSize,x, y,FoodType::Simple,Qt::red);
+        if(set.fieldColor == Qt::red)
+        {
+            food = new Food(set.fieldSize,x, y,FoodType::Simple,Qt::yellow);
+        }
+        else
+        {
+            food = new Food(set.fieldSize,x, y,FoodType::Simple,Qt::red);
+        }
     }
     current_step++;
     scene.addItem(food);

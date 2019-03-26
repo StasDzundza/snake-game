@@ -41,11 +41,6 @@ public slots:
     void resume();
     void gameOver();
 
-private slots:
-
-
-
-
 protected:
      bool eventFilter(QObject *object, QEvent *event);
 
@@ -63,7 +58,7 @@ private:
 
     SettingsData set;
 
-    const int FoodTypeInterval = 4;
+    const int FoodTypeInterval = 8;
     int current_step = 1;
 
     QTimer timerForFoodEffect;
