@@ -7,7 +7,7 @@
 #include <fstream>
 #include <QFile>
 #include <QTextStream>
-#include <QSignalMapper>
+#include <QDebug>
 #include <QTime>
 
 GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
@@ -31,6 +31,10 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
     scene.installEventFilter(this);
 
     resume();
+
+    connect(&timerForStopwatch,&QTimer::timeout,this,&GameController::SendStopwatchData);
+    stopWatch = new stopwatch;
+
 }
 
 GameController::~GameController()
@@ -71,7 +75,15 @@ void GameController::snakeAteItself()
 void GameController::handleKeyPressed(QKeyEvent *event)
 {
     if (!isPause)
-        switch (event->key()) {
+    {
+        if(!gameIsStarted && (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right||event->key() == Qt::Key_Up||event->key() == Qt::Key_Down))
+        {
+            gameIsStarted = true;
+            stopWatch->Start();
+            timerForStopwatch.start(20);
+        }
+        switch (event->key())
+        {
             case Qt::Key_Left:
                 snake->setMoveDirection(Snake::MoveLeft);
                 break;
@@ -88,6 +100,7 @@ void GameController::handleKeyPressed(QKeyEvent *event)
                 pause();
                 break;
         }
+    }
     else resume();
 }
 
@@ -149,8 +162,11 @@ void GameController::addNewFood()
 void GameController::gameOver()
 {
     //Этот слот продвигает сцену на один шаг вызывая QGraphicsItem::advance() для всех элементов на сцене.
+    timerForStopwatch.stop();
+    stopWatch->Stop();
     disconnect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
     AddResultToLeaderboard();
+    stopWatch->Reset();
     if (QMessageBox::Yes == QMessageBox::information(NULL,
                             tr("Game Over"), tr("Again?"),
                             QMessageBox::Yes | QMessageBox::No,
@@ -161,6 +177,8 @@ void GameController::gameOver()
         snake = new Snake(set.snakeSpeed,set.fieldSize,set.snakeColor,*this);
         scene.addItem(snake);
         addNewFood();
+        gameIsStarted = false;
+        emit sendStatusBarData("");
     } else {
         emit closeWnd();
     }
@@ -172,8 +190,18 @@ void GameController::SetDefaultSpeed(int speed)
     timerForFoodEffect.stop();
 }
 
+void GameController::SendStopwatchData()
+{
+    emit sendStatusBarData(stopWatch->GetTime());
+}
+
 void GameController::pause()
 {
+    if(gameIsStarted)
+    {
+        timerForStopwatch.stop();
+        stopWatch->Stop();
+    }
     disconnect(&timer, SIGNAL(timeout()),
                &scene, SLOT(advance()));
     isPause = true;
@@ -181,6 +209,11 @@ void GameController::pause()
 
 void GameController::resume()
 {
+    if(gameIsStarted)
+    {
+        stopWatch->Start();
+        timerForStopwatch.start(20);
+    }
     connect(&timer, SIGNAL(timeout()),
             &scene, SLOT(advance()));
     isPause = false;
@@ -209,9 +242,9 @@ void GameController::AddResultToLeaderboard()
     {
        LeaderboardData *data = new LeaderboardData;
        data->name = str;
-       data->time = "Null";
+       data->time = stopWatch->GetTime();
        data->difficult = set.difficult;
-       data->snakeLength = snake->GetLength();
+       data->score = snake->GetLength();
        data->fieldSize = set.fieldSize;
 
        QFile fileOut("leaderboard.txt"); // Связываем объект с файлом fileout.txt
@@ -221,7 +254,7 @@ void GameController::AddResultToLeaderboard()
            writeStream << data->name + "\n";
            writeStream << data->time + "\n";
            writeStream << data->difficult + "\n";
-           writeStream << QString::number(data->snakeLength) + "\n";
+           writeStream << QString::number(data->score) + "\n";
            writeStream << QString::number(data->fieldSize) + "\n";
            fileOut.close();
        }

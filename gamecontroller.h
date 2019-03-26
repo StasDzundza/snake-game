@@ -9,19 +9,20 @@
 #include "food.h"
 #include "snake.h"
 #include <QTimer>
+#include "stopwatch.h"
 
 struct LeaderboardData
 {
     LeaderboardData(){}
-    LeaderboardData(QString name, QString time ,QString difficult, int fieldSize,int snakeLength)
+    LeaderboardData(QString name, QString time ,QString difficult, int fieldSize,int score)
     {
-        this->name = name;this->time = time;this->difficult = difficult;this->fieldSize = fieldSize;this->snakeLength = snakeLength;
+        this->name = name;this->time = time;this->difficult = difficult;this->fieldSize = fieldSize;this->score = score;
     }
     QString name = "";
     QString time = "null";
     QString difficult = "";
     int fieldSize;
-    int snakeLength;
+    int score;
 };
 
 class GameController : public QObject
@@ -36,6 +37,7 @@ public:
     void snakeAteItself();
 signals:
     void closeWnd();
+    void sendStatusBarData(QString str);
 public slots:
     void pause();
     void resume();
@@ -49,12 +51,13 @@ private:
     void addNewFood();
     void AddResultToLeaderboard();
     void SetDefaultSpeed(int speed);
-
+    void SendStopwatchData();
     QTimer timer;
     QGraphicsScene &scene;
 
     Snake *snake;
     bool isPause;
+    bool gameIsStarted = false;
 
     SettingsData set;
 
@@ -62,6 +65,11 @@ private:
     int current_step = 1;
 
     QTimer timerForFoodEffect;
+
+    stopwatch *stopWatch;
+    QTimer timePassed;
+    QTimer timerForStopwatch;
+    int record = 0;
 };
 
 #endif // GAMECONTROLLER_H

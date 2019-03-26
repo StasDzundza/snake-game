@@ -29,6 +29,7 @@ private:
     void initScene();
     void initSceneBackground(const int& fieldSize,QColor fieldColor);
 
+    void UpdateStatusBar(QString data);
 
     QGraphicsScene *scene;
     QGraphicsView *view;

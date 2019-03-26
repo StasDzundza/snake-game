@@ -9,6 +9,7 @@
 #include "gamecontroller.h"
 #include "gamewindow.h"
 #include <QIcon>
+#include <QStatusBar>
 
 GameWindow::GameWindow(SettingsData settings, QWidget *parent)
     : QMainWindow(parent),
@@ -29,8 +30,11 @@ GameWindow::GameWindow(SettingsData settings, QWidget *parent)
     initSceneBackground(settings.fieldSize,settings.fieldColor);
 
     QTimer::singleShot(0, this, SLOT(adjustViewSize()));
-}
 
+    QStatusBar* bar = new QStatusBar(this);
+    this->setStatusBar(bar);
+    connect(game,&GameController::sendStatusBarData,this,&GameWindow::UpdateStatusBar);
+}
 GameWindow::~GameWindow()
 {
 
@@ -40,7 +44,7 @@ void GameWindow::adjustViewSize()
 {
     /*Масштабирует матрицу вида и прокручивает полосы прокрутки чтобы обеспечить
      * что прямоугольник сцены rect помещался в области просмотра.*/
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatioByExpanding);
+    view->fitInView(scene->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 void GameWindow::createActions()
@@ -114,6 +118,11 @@ void GameWindow::initSceneBackground(const int& fieldSize,QColor fieldColor)
     view->setBackgroundBrush(QBrush(bg));
 }
 
+void GameWindow::UpdateStatusBar(QString data)
+{
+    this->statusBar()->showMessage(data);
+}
+
 void GameWindow::newGame()
 {
     //запускаємо нову гру
@@ -125,7 +134,7 @@ void GameWindow::about()
 {
     QMessageBox::about(this, tr("About this Game"), tr("<h2>Snake Game</h2>"
         "<p>Copyright &copy; XXX."
-        "<p>This game is a small Qt application. It is based on the demo in the GitHub written by Devbean."));
+        "<p>This game is a small Qt application. It is based on the demo in the GitHub written by Devbean and Stas Dzundza."));
 }
 
 void GameWindow::gameHelp()

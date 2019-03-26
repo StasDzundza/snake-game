@@ -29,7 +29,7 @@ void Leaderboard::ShowLeaderboard()
                ui->leaderboard->append("Name : " + file.readLine() + "\n");
                ui->leaderboard->append("Time : " + file.readLine() + "\n");
                ui->leaderboard->append("Difficult : " + file.readLine() + "\n");
-               ui->leaderboard->append("Snake length : " + file.readLine() + "\n");
+               ui->leaderboard->append("Score : " + file.readLine() + "\n");
                ui->leaderboard->append("Field size : " + file.readLine() + "\n");
 
                ui->leaderboard->append("---------------------------------------------");

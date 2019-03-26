@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     wall.cpp \
     gamewindow.cpp \
     settings.cpp \
-    leaderboard.cpp
+    leaderboard.cpp \
+    stopwatch.cpp
 
 HEADERS  += mainwindow.h \
     food.h \
@@ -30,7 +31,8 @@ HEADERS  += mainwindow.h \
     wall.h \
     gamewindow.h \
     settings.h \
-    leaderboard.h
+    leaderboard.h \
+    stopwatch.h
 
 RESOURCES += \
     res.qrc
