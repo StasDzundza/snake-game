@@ -283,9 +283,11 @@ void GameController::gameOver()
                             QMessageBox::Yes)) {
         connect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
         scene.clear();
+
         //create new snake
         snake = new Snake(set.snakeSpeed,set.fieldSize,set.snakeColor,*this);
         scene.addItem(snake);
+
         //add new food
         addNewFood();
 
@@ -295,8 +297,10 @@ void GameController::gameOver()
             delete wall;
         }
         walls.clear();
+
         //create new walls
         addWalls();
+
         gameIsStarted = false;
         emit sendStatusBarData("");
     } else {//if user dont want to play again
