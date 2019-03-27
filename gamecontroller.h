@@ -8,7 +8,7 @@
 #include "settings.h"
 #include "food.h"
 #include "snake.h"
-#include <QTimer>
+#include "wall.h"
 #include "stopwatch.h"
 
 struct LeaderboardData
@@ -33,7 +33,7 @@ public:
     ~GameController();
 
     void snakeAteFood(Food *food);
-//    void snakeHitWall(Snake *snake, Wall *wall);
+    void snakeHitWall();
     void snakeAteItself();
 signals:
     void closeWnd();
@@ -49,6 +49,7 @@ protected:
 private:
     void handleKeyPressed(QKeyEvent *event);
     void addNewFood();
+    void addWall();
     void AddResultToLeaderboard();
     void SetDefaultSpeed(int speed);
     void SendStopwatchData();
@@ -74,6 +75,7 @@ private:
     int pointsForSimpleFood = 0;
     const int pointsForMoreScoreFood = 20;
     int score = 0;
+    QString resultTime;
 };
 
 #endif // GAMECONTROLLER_H

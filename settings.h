@@ -57,7 +57,7 @@ signals:
 
 private:
     Ui::Settings *ui;
-    QColor snakeColor = Qt::yellow;
+    QColor snakeColor = Qt::darkMagenta;
     QColor fieldColor = Qt::gray;
     SettingsData settings;
     QString difficult;

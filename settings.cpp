@@ -41,25 +41,25 @@ void Settings::on_SaveButton_clicked()
 {
     if(ui->rbEasy->isChecked())
     {
-        settings = SettingsData(6,7,snakeColor,fieldColor,"Easy");
+        settings = SettingsData(6,8,snakeColor,fieldColor,"Easy");
         difficult = "Easy";
         emit sendSettings(settings);
     }
     else if(ui->rbMedium->isChecked())
     {
-        settings = SettingsData(4,6,snakeColor,fieldColor,"Medium");
+        settings = SettingsData(4,7,snakeColor,fieldColor,"Medium");
         difficult = "Medium";
         emit sendSettings(settings);
     }
     else if(ui->rbHard->isChecked())
     {
-        settings = SettingsData(2,4,snakeColor,fieldColor,"Hard");
+        settings = SettingsData(2,6,snakeColor,fieldColor,"Hard");
         difficult = "Hard";
         emit sendSettings(settings);
     }
     else if(ui->rbExtreme->isChecked())
     {
-        settings = SettingsData(1,4,snakeColor,fieldColor,"Extreme");
+        settings = SettingsData(1,5,snakeColor,fieldColor,"Extreme");
         difficult = "Extreme";
         emit sendSettings(settings);
     }

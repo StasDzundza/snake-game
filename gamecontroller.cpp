@@ -31,6 +31,10 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
 
     addNewFood();
 
+    addWall();
+    addWall();
+    addWall();
+
     scene.addItem(snake);
     //An event filter is an object that
     //receives all events that are sent to this object.
@@ -77,9 +81,10 @@ void GameController::snakeAteFood(Food *food)
     addNewFood();
 }
 
-//void GameController::snakeHitWall(Snake *snake, Wall *wall)
-//{
-//}
+void GameController::snakeHitWall()
+{
+    QTimer::singleShot(0, this, SLOT(gameOver()));
+}
 
 void GameController::snakeAteItself()
 {
@@ -123,12 +128,12 @@ void GameController::addNewFood()
     int x, y;
 
     do {
-		x = (int)(qrand() % 200) / 10 - 10;
-		y = (int)(qrand() % 200) / 10 - 10;
+        x = (int)(qrand() % 200) / 10 - 10;
+        y = (int)(qrand() % 200) / 10 - 10;
 
         x *= 10;
         y *= 10;
-	} while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));
+    } while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));//while is collision between snake and food
 
     Food *food;
 
@@ -184,17 +189,35 @@ void GameController::addNewFood()
     scene.addItem(food);
 }
 
+void GameController::addWall()
+{
+    int x, y;
+
+    do {
+        x = (int)(qrand() % 200) / 10 - 10;
+        y = (int)(qrand() % 200) / 10 - 10;
+
+        x *= 10;
+        y *= 10;
+    } while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));//while is collision between snake and food
+
+    Wall *wall = new Wall(set.fieldSize,x,y,Qt::green);
+    scene.addItem(wall);
+}
+
 void GameController::gameOver()
 {
     //Этот слот продвигает сцену на один шаг вызывая QGraphicsItem::advance() для всех элементов на сцене.
-    timerForStopwatch.stop();
-    stopWatch->Stop();
 
     disconnect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
+    resultTime = stopWatch->GetTime();
+    timerForStopwatch.stop();
+    stopWatch->Stop();
 
     AddResultToLeaderboard();
 
     score = 0;
+    current_step = 1;
     stopWatch->Reset();
 
     if (QMessageBox::Yes == QMessageBox::information(NULL,
@@ -272,7 +295,7 @@ void GameController::AddResultToLeaderboard()
     {
        LeaderboardData *data = new LeaderboardData;
        data->name = str;
-       data->time = stopWatch->GetTime();
+       data->time = resultTime;
        data->difficult = set.difficult;
        data->score = score;
        data->fieldSize = set.fieldSize;

@@ -141,14 +141,14 @@ void Snake::moveLeft()
 {
     head.rx() -= SNAKE_SIZE;
     if (head.rx() < -100) {
-        head.rx() = 90;
+        head.rx() = 95;
     }
 }
 
 void Snake::moveRight()
 {
     head.rx() += SNAKE_SIZE;
-    if (head.rx() >= 100) {
+    if (head.rx() > 95) {
         head.rx() = -100;
     }
 }
@@ -157,14 +157,14 @@ void Snake::moveUp()
 {
     head.ry() -= SNAKE_SIZE;
     if (head.ry() < -100) {
-        head.ry() = 90;
+        head.ry() = 95;
     }
 }
 
 void Snake::moveDown()
 {
     head.ry() += SNAKE_SIZE;
-    if (head.ry() >= 100) {
+    if (head.ry() > 95) {
         head.ry() = -100;
     }
 }
@@ -179,6 +179,10 @@ void Snake::handleCollisions()
             // Let GameController handle the event by putting another apple
             controller.snakeAteFood((Food *)collidingItem);
             growing += 1;
+        }
+        else if(collidingItem->data(GD_Type) == GO_Wall)
+        {
+            controller.snakeHitWall();
         }
     }
 

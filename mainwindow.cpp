@@ -8,14 +8,14 @@
 #include "constants.h"
 #include "gamecontroller.h"
 #include "mainwindow.h"
+#include"ui_mainwindow.h"
 #include <QIcon>
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    CreateButtons();
-    setFixedSize(500, 500);
-
-    settingsData = SettingsData(5,5,Qt::yellow,Qt::gray,"Medium");
+    ui->setupUi(this);
+    //CreateButtons();
+    settingsData = SettingsData(5,5,Qt::darkMagenta,Qt::gray,"Medium");
 }
 
 MainWindow::~MainWindow()
@@ -23,7 +23,7 @@ MainWindow::~MainWindow()
     
 }
 
-void MainWindow::NewGame()
+/*void MainWindow::NewGame()
 {
     wnd = new GameWindow(settingsData);
     wnd->show();
@@ -66,10 +66,34 @@ void MainWindow::CreateButtons()
     QWidget *central_widget = new QWidget;
     central_widget->setLayout(this->layout);
     this->setCentralWidget(central_widget);
-}
+}*/
 
 void MainWindow::SaveSettings(SettingsData settings)
 {
     settingsData = settings;
 }
 
+
+void MainWindow::on_newGameBtn_clicked()
+{
+    wnd = new GameWindow(settingsData);
+    wnd->show();
+}
+
+void MainWindow::on_leaderboardBtn_clicked()
+{
+    leaderboardWindow = new Leaderboard;
+    leaderboardWindow->show();
+}
+
+void MainWindow::on_settingsBtn_clicked()
+{
+    settingsWindow = new Settings;
+    connect(settingsWindow,&Settings::sendSettings,this,&MainWindow::SaveSettings);
+    settingsWindow->show();
+}
+
+void MainWindow::on_quitBtn_clicked()
+{
+    QApplication::quit();
+}
