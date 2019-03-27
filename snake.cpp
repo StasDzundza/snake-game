@@ -6,7 +6,7 @@
 
 Snake::Snake(const int&snakeSpeed,const int&snakeSize,QColor snakeColor,GameController &controller) :
     head(0, 0),
-    growing(1),
+    growing(1),// start length of the snake
     moveDirection(NoMove),
     controller(controller),
     SNAKE_SIZE(snakeSize)
@@ -15,6 +15,8 @@ Snake::Snake(const int&snakeSpeed,const int&snakeSize,QColor snakeColor,GameCont
     speed = snakeSpeed;
 }
 
+/*This pure virtual function defines the outer bounds of the item as a rectangle; all painting must be restricted
+ * to inside an item's bounding rect. QGraphicsView uses this to determine whether the item requires redrawing.*/
 QRectF Snake::boundingRect() const
 {
     qreal minX = head.x();
@@ -40,6 +42,9 @@ QRectF Snake::boundingRect() const
     return bound;
 }
 
+/*Returns the shape of this item as a QPainterPath in local coordinates.
+     *  The shape is used for many things, including collision detection, hit tests, and for the QGraphicsScene::items() functions.
+        In our case,we use it for drawing  the snake object*/
 QPainterPath Snake::shape() const
 {
     QPainterPath path;
@@ -55,6 +60,7 @@ QPainterPath Snake::shape() const
     return path;
 }
 
+//this function draws the snake
 void Snake::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->save();
@@ -62,6 +68,7 @@ void Snake::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
     painter->restore();
 }
 
+//this function sets snake direction
 void Snake::setMoveDirection(Direction direction)
 {
     if (moveDirection == MoveLeft && direction == MoveRight)
@@ -94,21 +101,23 @@ void Snake::SetSpeed(int speed)
 {
     this->speed = speed;
 }
-//в заданому проміжку часу обновлюємо стан змії,тобто рухаємось
+
+//this function every time update snake position on the scene
 void Snake::advance(int step)
 {
     if (!step) {
         return;
     }
-    //чим більше значення швидкості ,тим повільнішою буде змійка,бо обновлення буде відбуватись повільно
+    //the more speed value so less speed of the snake,because function updates less times per time period
     if (tickCounter++ % speed != 0) {
         return;
     }
-    //на початку гри
+    //on the start of the game
     if (moveDirection == NoMove) {
         return;
     }
 
+    //move
     if (growing > 0) {
 		QPointF tailPoint = head;
         tail << tailPoint;
@@ -118,6 +127,7 @@ void Snake::advance(int step)
         tail << head;
     }
 
+    //there we call move functions,which rotates our snake
     switch (moveDirection) {
         case MoveLeft:
             moveLeft();
@@ -133,10 +143,14 @@ void Snake::advance(int step)
             break;
     }
 
+    //Sets the position of the item to pos, which is in parent coordinates.
+    //For items with no parent, pos is in scene coordinates.
     setPos(head);
+    //check the collisions between items
     handleCollisions();
 }
 
+//next functions change snake position
 void Snake::moveLeft()
 {
     head.rx() -= SNAKE_SIZE;
@@ -169,25 +183,29 @@ void Snake::moveDown()
     }
 }
 
+//function which handle collisions between snake and food/walls
 void Snake::handleCollisions()
 {
     QList<QGraphicsItem *> collisions = collidingItems();
 
     // Check collisions with other objects on screen
-    foreach (QGraphicsItem *collidingItem, collisions) {
-        if (collidingItem->data(GD_Type) == GO_Food) {
-            // Let GameController handle the event by putting another apple
+    foreach (QGraphicsItem *collidingItem, collisions)
+    {
+        if (collidingItem->data(GD_Type) == GO_Food)
+        {
+            // Let GameController handle the event by putting another food
             controller.snakeAteFood((Food *)collidingItem);
             growing += 1;
         }
-        else if(collidingItem->data(GD_Type) == GO_Wall)
+        else if(collidingItem->data(GD_Type) == GO_Wall)//snake hits the wall
         {
             controller.snakeHitWall();
         }
     }
 
     // Check snake eating itself
-    if (tail.contains(head)) {
+    if (tail.contains(head))
+    {
         controller.snakeAteItself();
     }
 }

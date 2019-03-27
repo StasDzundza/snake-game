@@ -14,8 +14,11 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //setting size for the window
+    this->setMaximumSize(this->size());
+    this->setMinimumSize(this->size());
     //CreateButtons();
-    settingsData = SettingsData(5,5,Qt::darkMagenta,Qt::gray,"Medium");
+    settingsData = SettingsData(5,5,Qt::darkMagenta,Qt::gray,"Medium");//default settings of the game
 }
 
 MainWindow::~MainWindow()
@@ -68,24 +71,27 @@ void MainWindow::CreateButtons()
     this->setCentralWidget(central_widget);
 }*/
 
+//function which receives and saves settings from setting window
 void MainWindow::SaveSettings(SettingsData settings)
 {
     settingsData = settings;
 }
 
-
+//new game button handler
 void MainWindow::on_newGameBtn_clicked()
 {
     wnd = new GameWindow(settingsData);
     wnd->show();
 }
 
+//leaderboard button handler
 void MainWindow::on_leaderboardBtn_clicked()
 {
     leaderboardWindow = new Leaderboard;
     leaderboardWindow->show();
 }
 
+//settings button handler
 void MainWindow::on_settingsBtn_clicked()
 {
     settingsWindow = new Settings;
@@ -93,6 +99,7 @@ void MainWindow::on_settingsBtn_clicked()
     settingsWindow->show();
 }
 
+//quit button handler
 void MainWindow::on_quitBtn_clicked()
 {
     QApplication::quit();

@@ -10,16 +10,20 @@ class Settings;
 struct SettingsData
 {
     SettingsData(){}
-    SettingsData(int snakeSpeed,int fieldSize,QColor snakeColor,QColor fieldColor,QString difficult)
+    SettingsData(int snakeSpeed,int fieldSize,QColor snakeColor,QColor fieldColor,QString difficult,int numOfWalls = 0,int wallLength = 1)
     {
         this->snakeSpeed = snakeSpeed;
         this->fieldSize = fieldSize;
         this->snakeColor = snakeColor;
         this->fieldColor = fieldColor;
         this->difficult = difficult;
+        this->numOfWalls = numOfWalls;
+        this->wallLength = wallLength;
     }
     int snakeSpeed;
     int fieldSize;
+    int numOfWalls;
+    int wallLength;
     QColor snakeColor;
     QColor fieldColor;
     QString difficult;

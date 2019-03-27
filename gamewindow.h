@@ -13,7 +13,7 @@ class GameWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    GameWindow(SettingsData settings, QWidget *parent = 0);
+    GameWindow(SettingsData settings, QWidget *parent = nullptr);
     ~GameWindow();
 
 private slots:
@@ -34,7 +34,7 @@ private:
     QGraphicsScene *scene;
     QGraphicsView *view;
 
-    GameController *game;
+    GameController *game;//object of the GameController
 
     QAction *newGameAction;
     QAction *pauseAction;

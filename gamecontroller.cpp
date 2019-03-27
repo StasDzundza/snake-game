@@ -13,7 +13,7 @@
 GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent) :
     QObject(parent),
     scene(scene),
-    snake(new Snake(settings.snakeSpeed,settings.fieldSize,settings.snakeColor,*this)),
+    snake(new Snake(settings.snakeSpeed,settings.fieldSize,settings.snakeColor,*this)),//reating new snake
     isPause(false)
 {
     //seed for random
@@ -31,10 +31,9 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
 
     addNewFood();
 
-    addWall();
-    addWall();
-    addWall();
+    addWalls();
 
+    //add snake on the scene
     scene.addItem(snake);
     //An event filter is an object that
     //receives all events that are sent to this object.
@@ -43,65 +42,87 @@ GameController::GameController(SettingsData settings,QGraphicsScene &scene, QObj
     resume();
 
     connect(&timerForStopwatch,&QTimer::timeout,this,&GameController::SendStopwatchData);
-    stopWatch = new stopwatch;
-
+    stopWatch = new stopwatch;//creates stopwatch
 }
 
 GameController::~GameController()
 {
+    //delete all walls
+    foreach(Wall*wall,walls)
+    {
+        delete wall;
+    }
+    walls.clear();
+
+    if(snake!=nullptr)
+    {
+       delete snake;
+    }
+
+    delete stopWatch;
 }
 
+//function which handles eating food by the snake
 void GameController::snakeAteFood(Food *food)
 { 
+    //if we ate food which makes us faster
     if(food->getFoodType() == FoodType::MakeFaster)
     {
-        int snakeSpeed = snake->GetSpeed();
+        int snakeSpeed = snake->GetSpeed();//save old speed
+        //set biggest speed for the snake
         if(snakeSpeed/2 == 0){ snake->SetSpeed(snakeSpeed/2 + 1);}
         else{snake->SetSpeed(snakeSpeed/2);}
-        connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });
-        timerForFoodEffect.start(8000);
+        connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });//connect timer with the slot,which set old speed for the snake
+        timerForFoodEffect.start(8000);//start this timer
     }
+    //if we ate food which makes us lower
     else if(food->getFoodType() == FoodType::MakeLower)
     {
-        int snakeSpeed = snake->GetSpeed();
+        int snakeSpeed = snake->GetSpeed();//save old speed
+        //set lowest speed for the snake
         snake->SetSpeed(snakeSpeed*2);
-        connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });
-        timerForFoodEffect.start(8000);
+        connect(&timerForFoodEffect,&QTimer::timeout,[=] { SetDefaultSpeed(snakeSpeed); });//connect timer with the slot,which set old speed for the snake
+        timerForFoodEffect.start(8000);//start this timer
     }
     if(food->getFoodType() == FoodType::Simple || food->getFoodType() == FoodType::MakeLower || food->getFoodType() == FoodType::MakeFaster)
     {
         score+=pointsForSimpleFood;
     }
-    else
+    else//if we ate food which give more points to score
     {
         score+=pointsForMoreScoreFood;
     }
-    scene.removeItem(food);
+    scene.removeItem(food);//remove food from the scene
+    delete food;
 
-    addNewFood();
+    addNewFood();//add new food
 }
 
+//function which handles eating wall by the snake
 void GameController::snakeHitWall()
 {
     QTimer::singleShot(0, this, SLOT(gameOver()));
 }
 
+//function which handles eating itsels
 void GameController::snakeAteItself()
 {
     QTimer::singleShot(0, this, SLOT(gameOver()));
 }
 
+//function which handles key,which was pressed on the keyboard
 void GameController::handleKeyPressed(QKeyEvent *event)
 {
     if (!isPause)
     {
+        //if game isn`t started already and we starts it
         if(!gameIsStarted && (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right||event->key() == Qt::Key_Up||event->key() == Qt::Key_Down))
         {
             gameIsStarted = true;
             stopWatch->Start();
             timerForStopwatch.start(20);
         }
-        switch (event->key())
+        switch (event->key())//set direction for the snake with the help of handled key
         {
             case Qt::Key_Left:
                 snake->setMoveDirection(Snake::MoveLeft);
@@ -120,28 +141,42 @@ void GameController::handleKeyPressed(QKeyEvent *event)
                 break;
         }
     }
+    //resume game if it was on pause mode
     else resume();
 }
 
+//function which add new food on the scene
 void GameController::addNewFood()
 {
     int x, y;
-
+    bool collision;
     do {
+        collision = false;
+        //generate random coordinates of the food
         x = (int)(qrand() % 200) / 10 - 10;
         y = (int)(qrand() % 200) / 10 - 10;
 
         x *= 10;
         y *= 10;
-    } while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));//while is collision between snake and food
+        //chech the collision betwin this coordinates and walls
+        foreach(Wall*wall,walls)
+        {
+            if(wall->shape().contains(wall->mapFromScene(QPointF(x + 5, y + 5))))
+            {
+                collision = true;
+                break;
+            }
+        }//while is collision between snake and food generates coordinates again
+    } while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))) || collision);
 
     Food *food;
 
-    if(current_step%FoodForSpeedInterval == 0)
+    if(current_step%FoodForSpeedInterval == 0)//if we should create food for speed change(every 8th food object)
     {
         int type = qrand()%2 + 1;
-        if(type == 1)
+        if(type == 1)//make faster type
         {
+            //check the colors so that they are not the same
             if(set.fieldColor == Qt::green)
             {
                 food = new Food(set.fieldSize,x, y,FoodType::MakeFaster,Qt::cyan);
@@ -151,8 +186,9 @@ void GameController::addNewFood()
                 food = new Food(set.fieldSize,x, y,FoodType::MakeFaster,Qt::green);
             }
         }
-        else
+        else//make lower type
         {
+            //check the colors so that they are not the same
             if(set.fieldColor == Qt::black)
             {
                 food = new Food(set.fieldSize,x, y,FoodType::MakeLower,Qt::darkGray);
@@ -163,8 +199,9 @@ void GameController::addNewFood()
             }
         }
     }
-    else if(current_step%FoodForPointsInterval == 0)
+    else if(current_step%FoodForPointsInterval == 0)//if we should create food for score change(every 13th food object)
     {
+        //check the colors so that they are not the same
         if(set.fieldColor == Qt::white)
         {
             food = new Food(set.fieldSize,x, y,FoodType::MorePointsToScore,Qt::darkBlue);
@@ -174,8 +211,9 @@ void GameController::addNewFood()
             food = new Food(set.fieldSize,x, y,FoodType::MorePointsToScore,Qt::white);
         }
     }
-    else
+    else//simple food object
     {
+        //check the colors so that they are not the same
         if(set.fieldColor == Qt::red)
         {
             food = new Food(set.fieldSize,x, y,FoodType::Simple,Qt::yellow);
@@ -186,23 +224,39 @@ void GameController::addNewFood()
         }
     }
     current_step++;
-    scene.addItem(food);
+    scene.addItem(food);//add vreated food on the scene
 }
 
-void GameController::addWall()
+//adds walls on the scene
+void GameController::addWalls()
 {
-    int x, y;
+    for(int i = 0; i < set.numOfWalls;i++)
+    {
+        int x, y;
 
-    do {
-        x = (int)(qrand() % 200) / 10 - 10;
-        y = (int)(qrand() % 200) / 10 - 10;
+        do {
+            //generate random coordinates of the wall
+            x = (int)(qrand() % 200) / 10 - 10;
+            y = (int)(qrand() % 200) / 10 - 10;
 
-        x *= 10;
-        y *= 10;
-    } while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));//while is collision between snake and food
+            x *= 10;
+            y *= 10;
+        } while (snake->shape().contains(snake->mapFromScene(QPointF(x + 5, y + 5))));//while is collision between snake and wall
 
-    Wall *wall = new Wall(set.fieldSize,x,y,Qt::green);
-    scene.addItem(wall);
+        int position = (int)qrand()%2;
+        Wall *wall;
+        if(set.fieldColor == Qt::green)
+        {
+            wall = new Wall(set.fieldSize,set.wallLength,(Wall::Position)position,x,y,Qt::blue);
+        }
+        else
+        {
+            wall = new Wall(set.fieldSize,set.wallLength,(Wall::Position)position,x,y,Qt::green);
+        }
+
+        walls.push_back(wall);
+        scene.addItem(wall);
+    }
 }
 
 void GameController::gameOver()
@@ -212,49 +266,66 @@ void GameController::gameOver()
     disconnect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
     resultTime = stopWatch->GetTime();
     timerForStopwatch.stop();
-    stopWatch->Stop();
+    stopWatch->Stop();//stops stopwatch
 
+    //add result to the leaderboard file
     AddResultToLeaderboard();
 
+    //reset all helpful values
     score = 0;
     current_step = 1;
     stopWatch->Reset();
 
+    //if user want to play again
     if (QMessageBox::Yes == QMessageBox::information(NULL,
                             tr("Game Over"), tr("Again?"),
                             QMessageBox::Yes | QMessageBox::No,
                             QMessageBox::Yes)) {
         connect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
         scene.clear();
-
+        //create new snake
         snake = new Snake(set.snakeSpeed,set.fieldSize,set.snakeColor,*this);
         scene.addItem(snake);
+        //add new food
         addNewFood();
+
+        //delete old walls
+        foreach(Wall*wall,walls)
+        {
+            delete wall;
+        }
+        walls.clear();
+        //create new walls
+        addWalls();
         gameIsStarted = false;
         emit sendStatusBarData("");
-    } else {
-        emit closeWnd();
+    } else {//if user dont want to play again
+        emit closeWnd();//close this window
     }
 }
 
+//function which set default speed for the snake
 void GameController::SetDefaultSpeed(int speed)
 {
     snake->SetSpeed(speed);
     timerForFoodEffect.stop();
 }
 
+//function whish sends time and score to the game window
 void GameController::SendStopwatchData()
 {
     emit sendStatusBarData(stopWatch->GetTime() +  "    Score = " + QString::number(score));
 }
 
+//pause handler
 void GameController::pause()
 {
     if(gameIsStarted)
     {
         timerForStopwatch.stop();
-        stopWatch->Stop();
+        stopWatch->Stop();//stop stopwatch
     }
+    //stop moving of the snake
     disconnect(&timer, SIGNAL(timeout()),
                &scene, SLOT(advance()));
     isPause = true;
@@ -264,18 +335,19 @@ void GameController::resume()
 {
     if(gameIsStarted)
     {
-        stopWatch->Start();
+        stopWatch->Start();//resume stopwatch
         timerForStopwatch.start(20);
     }
+    //resume moving of the snake
     connect(&timer, SIGNAL(timeout()),
             &scene, SLOT(advance()));
     isPause = false;
 }
-//обробник подій,який буде реагувати на натискання наших клавіш
 
+//handler which handle key pressing
 bool GameController::eventFilter(QObject *object, QEvent *event)
 {
-    //якщо була натиснута клавіша,то перевіряємо яка
+    //if key was pressed we handle it
     if (event->type() == QEvent::KeyPress) {
         handleKeyPressed((QKeyEvent *)event);
         return true;
@@ -287,9 +359,9 @@ bool GameController::eventFilter(QObject *object, QEvent *event)
 void GameController::AddResultToLeaderboard()
 {
     bool bOk;
-    QString str = QInputDialog::getText( nullptr, "Input", "Name:", QLineEdit::Normal, "Stas",  &bOk );
+    QString str = QInputDialog::getText( nullptr, "Input", "Name:", QLineEdit::Normal, "Stas",  &bOk );//open input dialog window for entering name
     if (!bOk) {
-        // Была нажата кнопка Cancel
+        //cancel was pressed
     }
     else
     {
@@ -303,13 +375,14 @@ void GameController::AddResultToLeaderboard()
        QFile fileOut("leaderboard.txt"); // Связываем объект с файлом fileout.txt
        if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
        {
-           QTextStream writeStream(&fileOut); // Создаем объект класса QTextStream
+           QTextStream writeStream(&fileOut); // create ne object of QTextStream class
+           //write all info into the file
            writeStream << data->name + "\n";
            writeStream << data->time + "\n";
            writeStream << data->difficult + "\n";
            writeStream << QString::number(data->score) + "\n";
            writeStream << QString::number(data->fieldSize) + "\n";
-           fileOut.close();
+           fileOut.close();//close file
        }
 
     }

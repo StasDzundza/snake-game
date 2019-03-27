@@ -20,7 +20,7 @@ GameWindow::GameWindow(SettingsData settings, QWidget *parent)
     setCentralWidget(view);
 
     connect(game,SIGNAL(closeWnd()),this,SLOT(close()));
-    setFixedSize(800, 800);
+    setFixedSize(800, 800);//setting the fixed size of the window
     setWindowIcon(QIcon(":/images/snake_ico"));
 
     createActions();
@@ -31,22 +31,33 @@ GameWindow::GameWindow(SettingsData settings, QWidget *parent)
 
     QTimer::singleShot(0, this, SLOT(adjustViewSize()));
 
+    //creating status bar for showing time and score
     QStatusBar* bar = new QStatusBar(this);
     this->setStatusBar(bar);
-    connect(game,&GameController::sendStatusBarData,this,&GameWindow::UpdateStatusBar);
+    connect(game,&GameController::sendStatusBarData,this,&GameWindow::UpdateStatusBar);//connect with the signal from game controller
 }
 GameWindow::~GameWindow()
 {
-
+    delete game;
+    delete scene;
+    delete view;
+    delete newGameAction;
+    delete pauseAction;
+    delete resumeAction;
+    delete exitAction;
+    delete gameHelpAction;
+    delete aboutAction;
+    delete aboutQtAction;
 }
 
+//Scales the view matrix and scrolls the scroll bars to ensure that the scene rectangle
+//rect fits inside the viewport. rect must be inside the scene rect;
 void GameWindow::adjustViewSize()
 {
-    /*Масштабирует матрицу вида и прокручивает полосы прокрутки чтобы обеспечить
-     * что прямоугольник сцены rect помещался в области просмотра.*/
     view->fitInView(scene->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
+//this function create actions for menu bar and sets hotkeys
 void GameWindow::createActions()
 {
     newGameAction = new QAction(tr("&New Game"), this);
@@ -81,6 +92,7 @@ void GameWindow::createActions()
     connect(aboutQtAction, &QAction::triggered, qApp, QApplication::aboutQt);
 }
 
+//this function creates menu bar and adds created before menu actions to the menu bar
 void GameWindow::createMenus()
 {
     QMenu *options = menuBar()->addMenu(tr("&Options"));
@@ -97,15 +109,18 @@ void GameWindow::createMenus()
     help->addAction(aboutQtAction);
 }
 
+//Set the size of the scene to the size of the widget
 void GameWindow::initScene()
 {
-    /* Устанавливаем размер сцены по размеру виджета
-         * Первая координата - это левый верхний угол,
-         * а Вторая - это правый нижний угол
-         * */
+    //This property holds the scene rectangle; the bounding rectangle of the scene
     scene->setSceneRect(-100, -100, 200, 200);
+    /* The first coordinate is the upper left corner,
+              * and the second is the lower right corner
+              * */
 }
 
+
+//this function fills background of the scene(draws field for snake)
 void GameWindow::initSceneBackground(const int& fieldSize,QColor fieldColor)
 {
 
@@ -118,16 +133,16 @@ void GameWindow::initSceneBackground(const int& fieldSize,QColor fieldColor)
     view->setBackgroundBrush(QBrush(bg));
 }
 
+//this slot receives time and score from game controller and updates status bar
 void GameWindow::UpdateStatusBar(QString data)
 {
     this->statusBar()->showMessage(data);
 }
 
+//function which starts new game
 void GameWindow::newGame()
 {
-    //запускаємо нову гру
     QTimer::singleShot(0, game, SLOT(gameOver()));
-
 }
 
 void GameWindow::about()

@@ -4,6 +4,8 @@
 #include <QGraphicsItem>
 #include <QColor>
 
+
+//enumeration fo food object
 enum FoodType
 {
     Simple,
@@ -18,18 +20,16 @@ public:
     Food(const int& foodSize,qreal x, qreal y);
     Food(const int& foodSize,qreal x, qreal y,FoodType foodType,QColor color);
 
+    //Three next functions are virtual,so we should to override them,because class Food derived from QGraphicsItem
 
-    /* Данные методы виртуальные, поэтому их необходимо реализовать
-        * в случае наследования от QGraphicsItem
-        * */
+    /*This pure virtual function defines the outer bounds of the item as a rectangle; all painting must be restricted
+     * to inside an item's bounding rect. QGraphicsView uses this to determine whether the item requires redrawing.*/
+    QRectF boundingRect() const;   
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);//this function draw the food on the scene
 
-    /* возвращаем координаты расположения точки
-         * по ним будет определяться нажатие точки
-         * */
-
-    QRectF boundingRect() const;
-    //draw the circle on the scene
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+    /*Returns the shape of this item as a QPainterPath in local coordinates.
+     *  The shape is used for many things, including collision detection, hit tests, and for the QGraphicsScene::items() functions.
+        In our case,we use it for drawing food object*/
     QPainterPath shape() const;
 
     void setFoodType(FoodType foodType);
@@ -37,6 +37,7 @@ public:
 
     void setFoodColor(QColor color);
     QColor getFoodColor();
+
 private:
     const int FOOD_SIZE;
     FoodType foodType;

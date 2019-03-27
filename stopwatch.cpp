@@ -11,6 +11,7 @@ stopwatch::~stopwatch()
     timer.stop();
 }
 
+//function returns current time on stopwatch
 QString stopwatch::GetTime()
 {
     int ms = time_on_stopwatch.msecsSinceStartOfDay() + QTime::currentTime().msecsSinceStartOfDay() - last_start.msecsSinceStartOfDay();
@@ -18,6 +19,7 @@ QString stopwatch::GetTime()
     return QTime::fromMSecsSinceStartOfDay(ms).toString("mm:ss:zzz");
 }
 
+//function starts or resumes stopwatch
 void stopwatch::Start()
 {
    if(!timer.isActive())
@@ -26,7 +28,7 @@ void stopwatch::Start()
         timer.start(20);
     }
 }
-
+//function stops stopwatch
 void stopwatch::Stop()
 {
     if(timer.isActive())
@@ -36,6 +38,7 @@ void stopwatch::Stop()
     }
 }
 
+//function resets stopwatch
 void stopwatch::Reset()
 {
     timer.stop();

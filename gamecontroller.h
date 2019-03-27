@@ -10,7 +10,11 @@
 #include "snake.h"
 #include "wall.h"
 #include "stopwatch.h"
+#include <list>
 
+using std::list;
+
+//struct for saving laderboard info
 struct LeaderboardData
 {
     LeaderboardData(){}
@@ -29,7 +33,7 @@ class GameController : public QObject
 {
     Q_OBJECT
 public:
-    GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent = 0);
+    GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent = nullptr);
     ~GameController();
 
     void snakeAteFood(Food *food);
@@ -49,7 +53,7 @@ protected:
 private:
     void handleKeyPressed(QKeyEvent *event);
     void addNewFood();
-    void addWall();
+    void addWalls();
     void AddResultToLeaderboard();
     void SetDefaultSpeed(int speed);
     void SendStopwatchData();
@@ -76,6 +80,8 @@ private:
     const int pointsForMoreScoreFood = 20;
     int score = 0;
     QString resultTime;
+
+    list<Wall*> walls;
 };
 
 #endif // GAMECONTROLLER_H
