@@ -1,5 +1,4 @@
 #include <QPainter>
-
 #include "constants.h"
 #include "gamecontroller.h"
 #include "snake.h"
@@ -102,9 +101,69 @@ void Snake::SetSpeed(int speed)
     this->speed = speed;
 }
 
+int Snake::GetHeadXCoordinate()
+{
+    return head.rx();
+}
+
+int Snake::GetHeadYCoordinate()
+{
+    return head.ry();
+}
+
 QColor Snake::GetColor()
 {
     return SNAKE_COLOR;
+}
+
+int Snake::TestMoveLeft()//returns new head x coordinate
+{
+    int current_x = head.rx();
+    current_x-= SNAKE_SIZE;//new value after move
+    return current_x;
+}
+
+int Snake::TestMoveRight()
+{
+    int current_x = head.rx();
+    current_x+= SNAKE_SIZE;//new value after move
+    return current_x;
+}
+
+int Snake::TestMoveUp()
+{
+    int current_y = head.ry();
+    current_y-= SNAKE_SIZE;//new value after move
+    return current_y;
+}
+
+int Snake::TestMoveDown()
+{
+    int current_y = head.ry();
+    current_y+= SNAKE_SIZE;//new value after move
+    return current_y;
+}
+
+//simple model of advance() function for testing program
+int Snake::TestAdvance()
+{
+    //on the start of the game
+    if (moveDirection == NoMove)
+    {
+        return -123;
+    }
+    //there we call move functions,which rotates our snake
+    switch ((int)moveDirection)
+    {
+        case (int)MoveLeft:
+            return TestMoveLeft();
+        case (int)MoveRight:
+            return TestMoveRight();
+        case (int)MoveUp:
+            return TestMoveUp();
+        case (int)MoveDown:
+            return TestMoveDown();
+    }
 }
 
 //this function every time update snake position on the scene

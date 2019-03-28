@@ -39,6 +39,8 @@ public:
     void snakeAteFood(Food *food);
     void snakeHitWall();
     void snakeAteItself();
+    void AddResultToLeaderboard();
+    void handleKeyPressed(QKeyEvent *event,bool isTest = false);//
 signals:
     void closeWnd();
     void sendStatusBarData(QString str);
@@ -51,10 +53,8 @@ protected:
      bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    void handleKeyPressed(QKeyEvent *event);
     void addNewFood();
     void addWalls();
-    void AddResultToLeaderboard();
     void SetDefaultSpeed(int speed);
     void SendStopwatchData();
     QTimer timer;
@@ -82,6 +82,7 @@ private:
     QString resultTime;
 
     list<Wall*> walls;
+
 };
 
 #endif // GAMECONTROLLER_H

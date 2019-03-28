@@ -111,12 +111,12 @@ void GameController::snakeAteItself()
 }
 
 //function which handles key,which was pressed on the keyboard
-void GameController::handleKeyPressed(QKeyEvent *event)
+void GameController::handleKeyPressed(QKeyEvent *event,bool isTest)
 {
-    if (!isPause)
+    if (!isPause || isTest)
     {
         //if game isn`t started already and we starts it
-        if(!gameIsStarted && (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right||event->key() == Qt::Key_Up||event->key() == Qt::Key_Down))
+        if(!gameIsStarted && (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right||event->key() == Qt::Key_Up||event->key() == Qt::Key_Down) && !isTest)
         {
             gameIsStarted = true;
             stopWatch->Start();

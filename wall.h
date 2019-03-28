@@ -12,7 +12,6 @@ public:
         Horizontal,
         Vertical
     };
-
     Wall (const int& wallSize,const int &wallLength, Position position ,qreal x, qreal y,QColor color);
     ~Wall();
 

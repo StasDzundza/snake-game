@@ -42,7 +42,17 @@ public:
     int GetSpeed();
     void SetSpeed(int speed);
 
+    int GetHeadXCoordinate();
+    int GetHeadYCoordinate();
     QColor GetColor();
+
+    //test move functions for testing program
+    int TestMoveLeft();
+    int TestMoveRight();
+    int TestMoveUp();
+    int TestMoveDown();
+
+    int TestAdvance();
 
 protected:
     /*This virtual function is called twice for all items by the QGraphicsScene::advance() slot. In the first phase,
@@ -51,6 +61,7 @@ protected:
     void advance(int step);
 
 private:
+
     //move functions
     void moveLeft();
     void moveRight();
