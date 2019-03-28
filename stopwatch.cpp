@@ -1,7 +1,6 @@
 #include "stopwatch.h"
 
-stopwatch::stopwatch(QWidget *parent) :
-    QDialog(parent)
+stopwatch::stopwatch(QWidget *parent):QDialog (parent)
 {
     running = false;
 }

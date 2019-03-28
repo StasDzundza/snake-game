@@ -42,6 +42,8 @@ public:
     int GetSpeed();
     void SetSpeed(int speed);
 
+    QColor GetColor();
+
 protected:
     /*This virtual function is called twice for all items by the QGraphicsScene::advance() slot. In the first phase,
     all items are called with phase == 0, indicating that items on the scene are about to advance, and then all items are called with phase == 1.

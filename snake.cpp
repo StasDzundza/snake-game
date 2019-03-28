@@ -102,6 +102,11 @@ void Snake::SetSpeed(int speed)
     this->speed = speed;
 }
 
+QColor Snake::GetColor()
+{
+    return SNAKE_COLOR;
+}
+
 //this function every time update snake position on the scene
 void Snake::advance(int step)
 {

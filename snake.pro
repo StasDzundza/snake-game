@@ -32,7 +32,9 @@ HEADERS  += mainwindow.h \
     gamewindow.h \
     settings.h \
     leaderboard.h \
-    stopwatch.h
+    stopwatch.h \
+    Tests/catch2/catch.hpp \
+    tests.h
 
 RESOURCES += \
     res.qrc

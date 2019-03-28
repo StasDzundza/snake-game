@@ -8,7 +8,7 @@ namespace Ui {
 class stopwatch;
 }
 
-class stopwatch : public QDialog
+class stopwatch:public QDialog
 {
     Q_OBJECT
 
