@@ -11,6 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = snake
 TEMPLATE = app
 
+INCLUDEPATH +="Tests/TestsForSnakeProject/googletest/include"
+INCLUDEPATH +="Tests/TestsForSnakeProject/googlemock/include"
+INCLUDEPATH +="Tests/TestsForSnakeProject/googletest"
+INCLUDEPATH +="Tests/TestsForSnakeProject/googlemock"
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -21,7 +25,9 @@ SOURCES += main.cpp\
     gamewindow.cpp \
     settings.cpp \
     leaderboard.cpp \
-    stopwatch.cpp
+    stopwatch.cpp \
+    Tests/TestsForSnakeProject/googletest/src/gtest-all.cc \
+    Tests/TestsForSnakeProject/googlemock/src/gmock-all.cc
 
 HEADERS  += mainwindow.h \
     food.h \
