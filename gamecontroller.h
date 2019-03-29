@@ -35,6 +35,8 @@ class GameController : public QObject
 public:
     FRIEND_TEST(GameController,Initialization);
     FRIEND_TEST(GameController,SnakeEatFood);
+    FRIEND_TEST(GameController,HandleKeyPressed);
+    FRIEND_TEST(GameController,SetDefaultSpeedAfterTime);
 
     GameController(SettingsData settings,QGraphicsScene &scene, QObject *parent = nullptr);
     ~GameController();

@@ -34,6 +34,8 @@ private:
     QGraphicsScene *scene;
     QGraphicsView *view;
 
+    QStatusBar* bar;
+
     GameController *game;//object of the GameController
 
     QAction *newGameAction;

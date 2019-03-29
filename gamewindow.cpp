@@ -32,7 +32,7 @@ GameWindow::GameWindow(SettingsData settings, QWidget *parent)
     QTimer::singleShot(0, this, SLOT(adjustViewSize()));
 
     //creating status bar for showing time and score
-    QStatusBar* bar = new QStatusBar(this);
+    bar = new QStatusBar(this);
     this->setStatusBar(bar);
     connect(game,&GameController::sendStatusBarData,this,&GameWindow::UpdateStatusBar);//connect with the signal from game controller
 }

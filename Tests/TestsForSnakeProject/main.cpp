@@ -9,6 +9,8 @@
 #include <QString>
 #include <QApplication>
 #include <QList>
+#include "gamewindow.h"
+
 //function which write result to leaderboard(function from class GameController)
 bool AddResultToLeaderboard(const char *filename,LeaderboardData& data);
 
@@ -136,6 +138,7 @@ TEST(Stopwatch,time)
     delete st;
 }
 
+//test if correct difficult settings after saving
 TEST(Settings,CheckDifficultSettings)
 {
     Settings *settings = new Settings;
@@ -153,6 +156,7 @@ TEST(Settings,CheckDifficultSettings)
     delete settings;
 }
 
+//Test scene initialization
 TEST(GameController,Initialization)
 {
     SettingsData*settings = new SettingsData(2,5,Qt::darkMagenta,Qt::gray,"Hard",1,1);
@@ -175,6 +179,7 @@ TEST(GameController,Initialization)
     delete scene;
 }
 
+//Test speed and score after eating food object
 TEST(GameController,SnakeEatFood)
 {
     SettingsData*settings = new SettingsData(2,5,Qt::darkMagenta,Qt::gray,"Hard",1,1);
@@ -219,6 +224,64 @@ TEST(GameController,SnakeEatFood)
     delete controller;
     delete scene;
 }
+
+TEST(GameController,HandleKeyPressed)
+{
+    SettingsData*settings = new SettingsData(2,5,Qt::darkMagenta,Qt::gray,"Hard",1,1);
+    QGraphicsScene*scene = new QGraphicsScene;
+    GameController*controller = new GameController(*settings,*scene);
+
+    int x = controller->snake->GetHeadXCoordinate();
+    int y = controller->snake->GetHeadYCoordinate();
+
+    EXPECT_EQ(Snake::Direction::NoMove,controller->snake->currentDirection());
+    EXPECT_EQ(-123,controller->snake->TestAdvance());
+
+    QKeyEvent*keyLeftEvent = new QKeyEvent( QEvent::KeyPress,Qt::Key_Left,Qt::KeyboardModifier::ControlModifier);
+    controller->handleKeyPressed(keyLeftEvent,true);//modeling a situation when left arrow was pressed
+    EXPECT_EQ(Snake::Direction::MoveLeft,controller->snake->currentDirection());
+    EXPECT_GT(x,controller->snake->TestAdvance())<<"Direction is MoveLeft \n";
+    delete keyLeftEvent;
+
+    QKeyEvent*keyUpEvent = new QKeyEvent( QEvent::KeyPress,Qt::Key_Up,Qt::KeyboardModifier::ControlModifier);
+    controller->handleKeyPressed(keyUpEvent,true);//modeling a situation when up arrow was pressed
+    EXPECT_EQ(Snake::Direction::MoveUp,controller->snake->currentDirection());
+    EXPECT_GT(y,controller->snake->TestAdvance())<<"Direction is MoveUp \n";
+    delete keyUpEvent;
+
+    QKeyEvent*keyRightEvent = new QKeyEvent( QEvent::KeyPress,Qt::Key_Right,Qt::KeyboardModifier::ControlModifier);
+    controller->handleKeyPressed(keyRightEvent,true);//modeling a situation when right arrow was pressed
+    EXPECT_EQ(Snake::Direction::MoveRight,controller->snake->currentDirection());
+    EXPECT_LT(x,controller->snake->TestAdvance())<<"Direction is MoveRight \n";
+    delete keyRightEvent;
+
+    QKeyEvent*keyDownEvent = new QKeyEvent( QEvent::KeyPress,Qt::Key_Down,Qt::KeyboardModifier::ControlModifier);
+    controller->handleKeyPressed(keyDownEvent,true);//modeling a situation when down arrow was pressed
+    EXPECT_EQ(Snake::Direction::MoveDown,controller->snake->currentDirection());
+    EXPECT_LT(y,controller->snake->TestAdvance())<<"Direction is MoveDown. \n";
+    delete keyDownEvent;
+
+
+}
+
+TEST(GameController,SetDefaultSpeedAfterTime)
+{
+    SettingsData*settings = new SettingsData(2,5,Qt::darkMagenta,Qt::gray,"Hard",1,1);
+    QGraphicsScene*scene = new QGraphicsScene;
+    GameController*controller = new GameController(*settings,*scene);
+
+    Food*food = new Food(6,10,18,FoodType::MakeLower,Qt::red);
+    int oldSpeed = controller->snake->GetSpeed();//save old speed
+    controller->snakeAteFood(food);//eat food which decrease speed
+    EXPECT_NE(oldSpeed,controller->snake->GetSpeed());//new speed should be less
+    controller->SetDefaultSpeed(oldSpeed);//set old speed
+    EXPECT_EQ(oldSpeed,controller->snake->GetSpeed());//ald should = new
+
+    delete settings;
+    delete controller;
+    delete scene;
+}
+
 int main(int argc,char*argv[])
 {
     QApplication a(argc,argv);
@@ -228,7 +291,7 @@ int main(int argc,char*argv[])
 
 bool AddResultToLeaderboard(const char *filename,LeaderboardData& data)
 {
-    QFile fileOut(filename); // Связываем объект с файлом fileout.txt
+    QFile fileOut(filename); // Связываем объект с файлом filname
     if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
     {
         QTextStream writeStream(&fileOut); // create ne object of QTextStream class
