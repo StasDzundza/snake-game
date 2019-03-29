@@ -7,7 +7,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QString>
-#include<QApplication>
+#include <QApplication>
+#include <QList>
 //function which write result to leaderboard(function from class GameController)
 bool AddResultToLeaderboard(const char *filename,LeaderboardData& data);
 
@@ -121,6 +122,7 @@ TEST(Food,SettertGetters)
     delete f;
 }
 
+
 TEST(Stopwatch,time)
 {
     stopwatch*st = new stopwatch;
@@ -147,6 +149,75 @@ TEST(Settings,CheckDifficultSettings)
     EXPECT_EQ("Easy",settings->settings.difficult);
     EXPECT_EQ(0,settings->settings.numOfWalls);
     EXPECT_EQ(1,settings->settings.wallLength);
+
+    delete settings;
+}
+
+TEST(GameController,Initialization)
+{
+    SettingsData*settings = new SettingsData(2,5,Qt::darkMagenta,Qt::gray,"Hard",1,1);
+    QGraphicsScene*scene = new QGraphicsScene;
+    GameController*controller = new GameController(*settings,*scene);
+    QList<QGraphicsItem*> sceneObjects = scene->items();
+
+    //check how many objects is created
+    EXPECT_EQ(3,sceneObjects.size());//it should be 3 because created 1 snake,1 food object and 1 wall;
+    controller->addNewFood();
+    controller->addNewFood();
+
+    QList<QGraphicsItem*> sceneObjects2 = scene->items();
+    EXPECT_EQ(5,sceneObjects2.size());//it should be 2 because we added 2 food object
+
+    sceneObjects.clear();
+    sceneObjects2.clear();
+    delete settings;
+    delete controller;
+    delete scene;
+}
+
+TEST(GameController,SnakeEatFood)
+{
+    SettingsData*settings = new SettingsData(2,5,Qt::darkMagenta,Qt::gray,"Hard",1,1);
+    QGraphicsScene*scene = new QGraphicsScene;
+    GameController*controller = new GameController(*settings,*scene);
+
+    int score = 0;
+    int snakeSpeed;
+
+    EXPECT_EQ(score,controller->score);//score == 0 at the beginning
+
+    Food*food = new Food(5,0,0,FoodType::MorePointsToScore,Qt::red);
+
+    snakeSpeed = controller->snake->GetSpeed();
+    controller->snakeAteFood(food);//eat food which give 20 points
+    score+=controller->pointsForMoreScoreFood;
+    EXPECT_EQ(score,controller->score);//check if score is correct
+    EXPECT_EQ(snakeSpeed,controller->snake->GetSpeed());//check if speed dont changed
+
+    food = new Food(6,10,18,FoodType::MakeFaster,Qt::red);
+    snakeSpeed = controller->snake->GetSpeed();
+    controller->snakeAteFood(food);//eat food which make snake faster and give 2 points on the hard mode
+    score+=controller->pointsForSimpleFood;
+    EXPECT_EQ(score,controller->score);//check if score is correct
+    EXPECT_GE(snakeSpeed,controller->snake->GetSpeed());//check if speed increased
+
+    food = new Food(5,0,0,FoodType::MakeLower,Qt::red);
+    snakeSpeed = controller->snake->GetSpeed();
+    controller->snakeAteFood(food);//eat food which make snake lower and give 2 points on the hard mode
+    score+=controller->pointsForSimpleFood;
+    EXPECT_EQ(score,controller->score);//check if score is correct
+    EXPECT_LE(snakeSpeed,controller->snake->GetSpeed());//check if speed decreased
+
+    food = new Food(5,0,0,FoodType::Simple,Qt::red);
+    snakeSpeed = controller->snake->GetSpeed();
+    controller->snakeAteFood(food);//eat food which give 2 points on the hard mode
+    score+=controller->pointsForSimpleFood;
+    EXPECT_EQ(score,controller->score);
+    EXPECT_EQ(snakeSpeed,controller->snake->GetSpeed());//check if speed dont changed
+
+    delete settings;
+    delete controller;
+    delete scene;
 }
 int main(int argc,char*argv[])
 {
