@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 #include <QColor>
-
+#include <gtest/gtest.h>
 
 //enumeration fo food object
 enum FoodType
@@ -17,6 +17,8 @@ enum FoodType
 class Food : public QGraphicsItem
 {
 public:
+    FRIEND_TEST(Food,SettertGetters);//this test if frien for this class
+
     Food(const int& foodSize,qreal x, qreal y);
     Food(const int& foodSize,qreal x, qreal y,FoodType foodType,QColor color);
 

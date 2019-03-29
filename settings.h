@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QString>
 #include <QColor>
+#include<gtest\gtest.h>
 namespace Ui {
 class Settings;
 }
@@ -34,6 +35,8 @@ class Settings : public QDialog
     Q_OBJECT
 
 public:
+    FRIEND_TEST(Settings,CheckDifficultSettings);
+
     explicit Settings(QWidget *parent = nullptr);
     ~Settings();
     QString Difficult();

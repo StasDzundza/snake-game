@@ -5,11 +5,16 @@
 #include <QRectF>
 #include "settings.h"
 #include <QColor>
+#include <gtest/gtest.h>
+
 class GameController;
 
 class Snake :public QObject, public QGraphicsItem
 {
 public:
+
+    FRIEND_TEST(Snake,Move);//this test if frien for this class
+
     //enumeration for snake direction
     enum Direction {
         NoMove,

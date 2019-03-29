@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QString>
-
+#include<QApplication>
 //function which write result to leaderboard(function from class GameController)
 bool AddResultToLeaderboard(const char *filename,LeaderboardData& data);
 
@@ -19,6 +19,8 @@ TEST(Snake,Constructor)
 
     EXPECT_EQ(snake->GetSpeed(),5);
     EXPECT_EQ(snake->GetColor(),Qt::red);
+
+    delete snake;
 }
 
 TEST(Snake,Move)
@@ -29,11 +31,25 @@ TEST(Snake,Move)
     int x = snake->GetHeadXCoordinate();
     int y = snake->GetHeadYCoordinate();
 
-    //check changing of coordinates after moves
-    EXPECT_GT(x,snake->TestMoveLeft())<<"MoveLeft \n";
-    EXPECT_LT(x,snake->TestMoveRight())<<"MoveRight \n";;
-    EXPECT_GT(y,snake->TestMoveUp())<<"MoveUp \n";;
-    EXPECT_LT(y,snake->TestMoveDown())<<"MoveDown \n";;
+    snake->moveLeft();
+    EXPECT_GT(x,snake->GetHeadXCoordinate());
+    x = snake->GetHeadXCoordinate();
+    y = snake->GetHeadYCoordinate();
+
+    snake->moveRight();
+    EXPECT_LT(x,snake->GetHeadXCoordinate());
+    x = snake->GetHeadXCoordinate();
+    y = snake->GetHeadYCoordinate();
+
+    snake->moveUp();
+    EXPECT_GT(y,snake->GetHeadYCoordinate());
+    x = snake->GetHeadXCoordinate();
+    y = snake->GetHeadYCoordinate();
+
+    snake->moveDown();
+    EXPECT_LT(y,snake->GetHeadYCoordinate());
+
+    delete snake;
 }
 
 TEST(Snake,advance)
@@ -55,6 +71,8 @@ TEST(Snake,advance)
     EXPECT_LT(y,snake->TestAdvance())<<"Direction is MoveDown. \n";;
     snake->setMoveDirection(Snake::Direction::NoMove);
     EXPECT_EQ(-123,snake->TestAdvance());
+
+    delete snake;
 }
 
 TEST(Leaderboard,ReadWrite)
@@ -87,8 +105,52 @@ TEST(Leaderboard,ReadWrite)
 
 }
 
+TEST(Food,SettertGetters)
+{
+    Food*f = new Food(5,0,0,FoodType::MakeLower,Qt::red);
+
+    EXPECT_EQ(5,f->FOOD_SIZE)<<"Incorrect food size \n";
+    EXPECT_EQ(f->foodColor,Qt::red)<<"Incorrect food color \n";
+    EXPECT_EQ(FoodType::MakeLower,f->foodType)<<"Incorrect food type \n";
+
+    f->setFoodType(FoodType::MorePointsToScore);
+    f->setFoodColor(Qt::green);
+    EXPECT_EQ(f->foodColor,Qt::green)<<"Incorrect food color \n";
+    EXPECT_EQ(FoodType::MorePointsToScore,f->foodType)<<"Incorrect food type \n";
+
+    delete f;
+}
+
+TEST(Stopwatch,time)
+{
+    stopwatch*st = new stopwatch;
+    st->Start();
+
+    QString res;
+    QTimer::singleShot(2000,nullptr,[&]{res = st->GetTime();});
+
+    EXPECT_LE(QTime::fromString("00.02.000"),QTime::fromString(res));
+
+    delete st;
+}
+
+TEST(Settings,CheckDifficultSettings)
+{
+    Settings *settings = new Settings;
+
+    settings->on_SaveButton_clicked();
+
+    EXPECT_EQ(6,settings->settings.snakeSpeed);
+    EXPECT_EQ(8,settings->settings.fieldSize);
+    EXPECT_EQ(settings->snakeColor,Qt::darkMagenta);
+    EXPECT_EQ(settings->fieldColor,Qt::gray);
+    EXPECT_EQ("Easy",settings->settings.difficult);
+    EXPECT_EQ(0,settings->settings.numOfWalls);
+    EXPECT_EQ(1,settings->settings.wallLength);
+}
 int main(int argc,char*argv[])
 {
+    QApplication a(argc,argv);
     ::testing::InitGoogleTest(&argc,argv);
     return RUN_ALL_TESTS();
 }
