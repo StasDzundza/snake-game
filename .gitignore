@@ -36,6 +36,10 @@ Makefile*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
+*.vpp*
+.*vpp.*
+
+
 # folders
 
 debug/
