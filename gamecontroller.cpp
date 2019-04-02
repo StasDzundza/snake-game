@@ -93,7 +93,6 @@ void GameController::snakeAteFood(Food *food)
         score+=pointsForMoreScoreFood;
     }
     scene.removeItem(food);//remove food from the scene
-    delete food;
 
     addNewFood();//add new food
 }
@@ -298,8 +297,6 @@ void GameController::gameOver()
 
         //add new food
         addNewFood();
-
-
 
         gameIsStarted = false;
         emit sendStatusBarData("");
