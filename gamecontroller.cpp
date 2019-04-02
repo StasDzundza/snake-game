@@ -284,22 +284,22 @@ void GameController::gameOver()
         connect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
         scene.clear();
 
+        qDebug()<<walls.size();
+
+        walls.clear();
+
+
         //create new snake
         snake = new Snake(set.snakeSpeed,set.fieldSize,set.snakeColor,*this);
         scene.addItem(snake);
 
+        //create new walls
+        addWalls();
+
         //add new food
         addNewFood();
 
-        //delete old walls
-        foreach(Wall*wall,walls)
-        {
-            delete wall;
-        }
-        walls.clear();
 
-        //create new walls
-        addWalls();
 
         gameIsStarted = false;
         emit sendStatusBarData("");

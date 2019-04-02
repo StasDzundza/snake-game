@@ -19,7 +19,8 @@ GameWindow::GameWindow(SettingsData settings, QWidget *parent)
 {
     setCentralWidget(view);
 
-    connect(game,SIGNAL(closeWnd()),this,SLOT(close()));
+    //this->setAttribute(Qt::WA_DeleteOnClose);
+    connect(game,SIGNAL(closeWnd()),this,SLOT(closeHandler()));
     setFixedSize(800, 800);//setting the fixed size of the window
     setWindowIcon(QIcon(":/images/snake_ico"));
 
@@ -149,7 +150,12 @@ void GameWindow::about()
 {
     QMessageBox::about(this, tr("About this Game"), tr("<h2>Snake Game</h2>"
         "<p>Copyright &copy; XXX."
-        "<p>This game is a small Qt application. It is based on the demo in the GitHub written by Devbean and Stas Dzundza."));
+                                                       "<p>This game is a small Qt application. It is based on the demo in the GitHub written by Devbean and Stas Dzundza."));
+}
+
+void GameWindow::closeHandler()
+{
+   this->close();
 }
 
 void GameWindow::gameHelp()

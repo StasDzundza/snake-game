@@ -21,6 +21,7 @@ private slots:
     void newGame();
     void gameHelp();
     void about();
+    void closeHandler();
 
 private:
     void createActions();
